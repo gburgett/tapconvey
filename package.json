@@ -2,7 +2,8 @@
   "name": "tapconvey",
   "version": "0.1.0",
   "description": "Reads TAP-formatted data from STDIN to display test results in a web application like goconvey",
-  "main": "index.js",
+  "main": "src/index.js",
+  "typings": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,4 +16,8 @@
   ],
   "author": "gordon@gordonburgett.net",
   "license": " 	Apache-2.0",
+  "devDependencies": {
+    "@types/node": "0.0.2",
+    "typescript": "^2.0.10"
+  }
 }
