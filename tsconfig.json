@@ -13,7 +13,8 @@
     "noLib": false,
     "preserveConstEnums": true,
     "suppressImplicitAnyIndexErrors": true,
-    "allowUnreachableCode": false
+    "allowUnreachableCode": false,
+    "types": [ "node" ]
   },
   "filesGlob": [
     "**/*.ts",

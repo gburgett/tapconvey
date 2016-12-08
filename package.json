@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "typings": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts'",
+    "test-watch": "mocha -w --compilers ts:ts-node/register --recursive 'src/**/*.test.ts'"
   },
   "keywords": [
     "tap",
@@ -15,9 +16,19 @@
     "tape"
   ],
   "author": "gordon@gordonburgett.net",
-  "license": " 	Apache-2.0",
+  "license": "Apache-2.0",
   "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.33",
     "@types/node": "0.0.2",
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "mocha-tap-reporter": "^0.1.3",
+    "ts-node": "^1.7.0",
     "typescript": "^2.0.10"
+  },
+  "dependencies": {
+    "nodemon": "^1.11.0",
+    "tap-parser": "^3.0.4"
   }
 }
