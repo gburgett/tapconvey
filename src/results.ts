@@ -1,6 +1,8 @@
-export class Results {
-  version: string = ''
-  items: Array<ResultItem>
+export class Summary {
+  version: number
+  time: string
+  tests: Assert[] = []
+  extra: Log = new Log()
 }
 
 export interface ResultItem {
@@ -20,11 +22,13 @@ export class Assert implements ResultItem {
   id: number
   comment: string
   success: boolean
+  time: number
 
-  constructor(success: boolean, id: number, comment: string): Assert {
+  constructor(success: boolean, id: number, comment: string, time?: number) {
     this.success = success
     this.comment = comment
     this.id = id
+    this.time = time
   }
 }
 
@@ -37,4 +41,7 @@ export class Comment implements ResultItem {
 
 export class Log implements ResultItem {
   lines: string[]
+  constructor(...lines: string[]) {
+    this.lines = lines || []
+  }
 }
