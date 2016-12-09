@@ -4,29 +4,37 @@ export class Results {
 }
 
 export interface ResultItem {
-  id: number
 }
 
 export class Test implements ResultItem {
   id: number
   name: string
   success: boolean
+  successfulAsserts: number
   asserts: number
-  items: Array<ResultItem>
+  time: string
+  items: Array<ResultItem> = []
 }
 
 export class Assert implements ResultItem {
   id: number
   comment: string
   success: boolean
+
+  constructor(success: boolean, id: number, comment: string): Assert {
+    this.success = success
+    this.comment = comment
+    this.id = id
+  }
 }
 
 export class Comment implements ResultItem {
-  id: number
   comment: string
+  constructor(comment: string) {
+    this.comment = comment
+  }
 }
 
 export class Log implements ResultItem {
-  id: number
   lines: string[]
 }

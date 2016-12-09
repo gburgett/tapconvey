@@ -6,103 +6,127 @@ import { Results, Test, Assert, Comment } from './results'
   into a Results object.
 */
 export class NodeTapParser extends Transform {
-  private in_progress: Results
-  private to_flush: Results[]
   private current: Test
   private parser: any
+  private isChild: boolean
   private callback
 
-  constructor(cb?: (error: Error, result: Results) => void, parser?: any) {
+  constructor(cb?: (error: Error) => void, parser?: any, isChild?: boolean) {
     super({
       readableObjectMode: true,
       writableObjectMode: false
     })
 
     this.callback = cb
-    this.in_progress = new Results()
-    this.to_flush = []
+    this.current = isChild ? new Test() : null
     this.parser = parser || require('tap-parser')()
-    this.parser.on('version', this._onVersion)
-    this.parser.on('comment', this._onComment)
-    this.parser.on('assert', this._onAssert)
-    this.parser.on('plan', this._onPlan)
-    this.parser.on('bailout', this._onBailout)
-    this.parser.on('child', this._onChild)
-    this.parser.on('extra', this._onExtra)
-    this.parser.on('end', this._onComplete)
+    this.isChild = isChild
+    this.parser.on('version', this._onVersion.bind(this))
+    this.parser.on('comment', this._onComment.bind(this))
+    this.parser.on('assert', this._onAssert.bind(this))
+    this.parser.on('plan', this._onPlan.bind(this))
+    this.parser.on('bailout', this._onBailout.bind(this))
+    this.parser.on('child', this._onChild.bind(this))
+    this.parser.on('extra', this._onExtra.bind(this))
+    this.parser.on('complete', this._onComplete.bind(this))
+    this.parser.on('end', this._onComplete.bind(this))
   }
 
   _transform(chunk: Buffer, encoding: string, callback: (Error, Any) => void) {
-    console.log('toTransform: ', chunk)
-    this.parser.write(chunk, encoding, callback)
+    console.log('toTransform: ', chunk.toString())
+    var ret = this.parser.write(chunk, encoding, callback)
+
   }
 
-  _flush(cb: () => void) {
-    if (this.callback && this.to_flush.length == 0) {
-      this.callback(null, null)
+  _flush(cb) {
+    if (this.callback) {
+      this.callback(null, this.current)
     }
-    this.to_flush.forEach(this._push)
-    this.to_flush = []
     cb()
   }
 
-  private _push(results: Results) {
-    this.push(results)
-    if (this.callback) {
-      this.callback(null, results)
-    }
-  }
-
-
   private _error(error: Error) {
     if (this.callback) {
-      this.callback(error, this.in_progress)
+      this.callback(error)
     }
     this.emit('error', error)
-    this.in_progress = new Results()
     this.current = undefined
   }
 
   private _onExtra(extra: string) {
-    console.error('onExtra: ', extra)
+    console.log('onExtra: ', extra)
   }
 
+  private _currentChildParser
   private _onChild(childParser: any) {
-    console.error('onChild - spawning new parser')
-    new NodeTapParser((error: Error, result: Results) => {
+    console.log('onChild - spawning new parser')
+    const self = this
+    this._currentChildParser = new NodeTapParser((error: Error) => {
       if (error) {
-        console.error('child error: ', error)
+        console.log('child error: ', error)
         this._error(error)
       }
+      console.log('child parser finished')
+      self._currentChildParser = undefined
     },
-      childParser)
+      childParser,
+      true)
+    this._currentChildParser.on('data', this._onChildTest.bind(this))
+  }
+
+  private _onChildTest(child: Test) {
+    console.log('child parser sent test: ', child.name)
+    if (this.isChild) {
+      this.current.items.push(child)
+    } else {
+      //top level parser pushes out child tests as it gets them
+      this.push(child)
+    }
   }
 
   private _onBailout(reason: string) {
-    console.error('onBailout: ', reason)
+    console.log('onBailout: ', reason)
   }
 
   private _onPlan(plan: any) {
-    console.error('onPlan: ', plan)
+    console.log('onPlan: ', plan)
   }
 
   private _onAssert(assert: any) {
-    console.error('onAssert: ', assert)
+    this.current.items.push(new Assert(assert.ok, assert.id, assert.name))
+    console.log('onAssert: ', assert)
   }
 
+  private static _TestNameRegexp = /^# Subtest\:\s+(.*)$/im
+  private static _TestTimeRegexp = /^# time=(.*)$/im
   private _onComment(comment: string) {
-    console.error('onComment: ', comment)
+    const testName = NodeTapParser._TestNameRegexp.exec(comment)
+
+    if (testName) {
+      this.current.name = testName[1]
+    } else {
+      const testTime = NodeTapParser._TestTimeRegexp.exec(comment)
+      if (testTime) {
+        this.current.time = testTime[1]
+      } else {
+        this.current.items.push(new Comment(comment))
+      }
+    }
+    console.log('onComment: ', comment)
   }
 
   private _onVersion(version: string) {
-    this.in_progress.version = version
-    console.error('onVersion: ', version)
+    this.emit('version', version)
+    console.log('onVersion: ', version)
   }
 
   private _onComplete(results: any) {
-    console.log('onComplete: ', results)
-    this.to_flush.push(this.in_progress)
-    this.in_progress = new Results()
+    console.log('onComplete ', results)
+    this.current.success = results.ok
+    this.current.asserts = results.count
+    this.current.successfulAsserts = results.pass
+    this.push(this.current)
+    this.current = new Test()
   }
 }
 
