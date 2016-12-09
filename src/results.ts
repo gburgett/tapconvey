@@ -1,6 +1,7 @@
 export class Summary {
   version: number
   time: string
+  bailout: string
   tests: Assert[] = []
   extra: Log = new Log()
 }
@@ -15,6 +16,7 @@ export class Test implements ResultItem {
   successfulAsserts: number
   asserts: number
   time: string
+  bailout: string
   items: Array<ResultItem> = []
 }
 

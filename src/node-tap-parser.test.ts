@@ -351,4 +351,95 @@ ok 1 - test/node-tap/test_2.js # time=206.12ms
       stdin.pipe(instance)
     })
   })
+
+  describe('test with bailout', () => {
+    const contents = `TAP version 13
+# Subtest: test/node-tap/test_2.js
+    1..2
+    # Subtest: this test finishes
+        1..1
+        ok 1 - this is a good assert
+    ok 1 - this test finishes # time=7.307ms
+
+    # Subtest: this test bails out
+        1..2
+        ok 1 - this is another good assert
+        Bail out! # some random error occured!
+Bail out! # some random error occured!
+
+`
+
+    it('should show bailout on the summary', (done) => {
+      const stdin = u.stringToStream(contents)
+
+      var summaryCount = 0
+      const instance = new NodeTapParser()
+      instance.on('summary', (summary: Summary) => {
+        summaryCount++
+
+        expect(summary.bailout).to.equal('# some random error occured!', 'bailout reason')
+
+        expect(summary.time).to.be.undefined
+        expect(summary.tests.length).to.equal(1, 'summary.tests.length')
+        expect(summary.tests[0].success).to.equal(false, 'tests[0].success')
+        expect(summary.tests[0].comment).to.equal('test/node-tap/test_2.js', 'tests[0].comment')
+
+      })
+      instance.on('end', () => {
+        expect(summaryCount).to.equal(1)
+        done()
+      })
+
+      // act
+      stdin.pipe(instance)
+      instance.resume()
+    })
+
+    it('should dump the bailed out test', (done) => {
+      const stdin = u.stringToStream(contents)
+
+      var tests: Test[] = []
+      const instance = new NodeTapParser()
+      instance.on('data', (data: Test) => {
+        tests.push(data)
+      })
+      instance.on('end', () => {
+        expect(tests).to.have.length(1, 'tests')
+
+        expect(tests[0].success).to.be.false
+        expect(tests[0].bailout).to.equal('# some random error occured!')
+        expect(tests[0].asserts).to.equal(1, 'tests[0].asserts')
+        expect(tests[0].successfulAsserts).to.equal(1, 'tests[0].successfulAsserts')
+
+        const sub0 = tests[0].items[0]
+        expect(sub0).to.be.instanceof(Test)
+        const test0 = sub0 as Test
+        expect(test0.success).to.be.true
+        const ass0 = tests[0].items[1] as Assert
+        expect(ass0.id).to.equal(1, 'assert for test0 id')
+        expect(ass0.comment).to.equal('this test finishes', 'assert for test0 name')
+        expect(ass0.success).to.equal(true, 'assert for test0 success')
+        expect(ass0.time).to.equal(7.307, 'assert for test0 time')
+
+        const sub2 = tests[0].items[2]
+        expect(sub2).to.be.instanceof(Test)
+        const test1 = sub2 as Test
+        expect(test1.success).to.be.false
+        expect(test1.bailout).to.equal('# some random error occured!')
+        const ass1 = tests[0].items[3] as Assert
+        expect(ass1.id).to.equal(-1, 'assert for test1 id should be bailout indicator')
+        expect(ass1.comment).to.equal('this test bails out', 'assert for test1 name')
+        expect(ass1.success).to.equal(false, 'assert for test1 success')
+        expect(ass1.time).to.equal(undefined, 'assert for test1 time')
+
+
+
+
+        done()
+      })
+
+      // act
+      stdin.pipe(instance)
+    })
+  })
 })

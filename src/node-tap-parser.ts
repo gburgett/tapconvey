@@ -43,23 +43,24 @@ export class NodeTapParser extends Transform {
   }
 
   _flush(cb) {
-    if (!this.emittedSummary) {
-      this.emit('summary', this.summary)
-      this.emittedSummary = true
-    }
-    if (this.callback) {
-      this.callback(null, this.summary)
-      this.summary = null
-    }
+    this._doFlush()
     cb()
   }
 
-  private _error(error: Error) {
-    if (this.callback) {
-      this.callback(error)
+  private _doFlush() {
+    if (!this.emittedSummary) {
+      this.emit('summary', this.summary)
+      if (this.callback) {
+        this.callback(null, this.summary)
+        this.summary = null
+      }
+      this.emittedSummary = true
     }
+  }
+
+  private _error(error: Error) {
     this.emit('error', error)
-    this.current = undefined
+    this._doFlush()
   }
 
   static _stripNewlines = /^\s+|\s+$/g
@@ -102,24 +103,40 @@ export class NodeTapParser extends Transform {
   }
 
   private _onComplete(results: any) {
+    // console.log('onComplete: ', results)
+    if (!this.current) {
+      return
+    }
     this.current.success = results.ok
     this.current.asserts = results.count
     this.current.successfulAsserts = results.pass
+    this.current.bailout = results.bailout
 
     if (this.stack.length == 0) {
       // back at the top of the stack - just finished a top-level test
       this.push(this.current)
+      if (results.bailout) {
+        this.summary.bailout = results.bailout
+        this.summary.tests.push(new Assert(false, -1, this.current.name))
+      }
       this.current = null
     } else {
       // the test that just finished was a subtest of the last stack item
       const prev = this.stack.pop()
       prev.items.push(this.current)
+      if (results.bailout) {
+        prev.items.push(new Assert(false, -1, this.current.name))
+      }
       this.current = prev
     }
   }
 
   private _onBailout(reason: string) {
-    console.log('onBailout: ', reason)
+    if (!this.current) {
+      // we followed the bailout to the top of the stack,
+      // finish the process
+      this._doFlush()
+    }
   }
 
   private _onPlan(plan: any) {
@@ -138,7 +155,7 @@ export class NodeTapParser extends Transform {
   private static _TestNameRegexp = /^# Subtest\:\s+(.*)$/im
   private static _TestTimeRegexp = /^# time=(.*)$/im
   private _onComment(comment: string) {
-    console.log('onComment: ', comment)
+    // console.log('onComment: ', comment)
     const testName = NodeTapParser._TestNameRegexp.exec(comment)
 
     if (testName) {
@@ -164,8 +181,7 @@ export class NodeTapParser extends Transform {
     } else if (!this.emittedSummary) {
       // the final line is the timing line
       this.summary.time = testTime
-      this.emit('summary', this.summary)
-      this.emittedSummary = true
+      this._doFlush()
     }
   }
 
