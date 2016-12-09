@@ -1,5 +1,5 @@
 import { Transform } from 'stream'
-import { Summary, Test, Assert, Comment, Log } from './results'
+import { Summary, Test, Plan, Assert, Comment, Log } from './results'
 
 /*
   Transform a stream of TAP formatted input
@@ -140,7 +140,9 @@ export class NodeTapParser extends Transform {
   }
 
   private _onPlan(plan: any) {
-    console.log('onPlan: ', plan)
+    if (this.current) {
+      this.current.plan = new Plan(plan.start, plan.end)
+    }
   }
 
   private _onAssert(assert: any) {

@@ -187,6 +187,8 @@ ok 1 - test/node-tap/test_2.js # time=202.366ms
       instance.on('data', (chunk: Test) => {
         expect(chunk).is.instanceOf(Test)
         expect(chunk.name).to.equal('test/node-tap/test_2.js')
+        expect(chunk.plan.start).to.equal(1, 'plan.start')
+        expect(chunk.plan.end).to.equal(1, 'plan.end')
         expect(chunk.asserts).to.equal(1)
         expect(chunk.successfulAsserts).to.equal(1)
         expect(chunk.success).to.be.true
@@ -263,6 +265,8 @@ ok 2 - test/node-tap/test_3.js # time=194.329ms
         expect(tests[0].name).to.equal('test/node-tap/test_2.js', 'test[0].name')
 
         expect(tests[1].name).to.equal('test/node-tap/test_3.js', 'test[1].name')
+        expect(tests[1].plan.start).to.equal(1, 'plan.start')
+        expect(tests[1].plan.end).to.equal(2, 'plan.end')
         expect(tests[1].asserts).to.equal(2, 'asserts')
         expect(tests[1].successfulAsserts).to.equal(2, 'successfulAsserts')
         expect(tests[1].success).to.be.true

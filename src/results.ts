@@ -12,12 +12,22 @@ export interface ResultItem {
 export class Test implements ResultItem {
   id: number
   name: string
+  plan: Plan
   success: boolean
   successfulAsserts: number
   asserts: number
   time: string
   bailout: string
   items: Array<ResultItem> = []
+}
+
+export class Plan {
+  start: number
+  end: number
+  constructor(start: number, end: number) {
+    this.start = start
+    this.end = end
+  }
 }
 
 export class Assert implements ResultItem {
