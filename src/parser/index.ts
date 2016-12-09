@@ -142,11 +142,13 @@ export class NodeTapParser extends Transform {
   }
 
   private _onAssert(assert: any) {
+    const toAdd = new Assert(assert.ok, assert.id, assert.name, assert.time)
+    toAdd.data = assert.diag
     if (this.current) {
-      this.current.items.push(new Assert(assert.ok, assert.id, assert.name, assert.time))
+      this.current.items.push(toAdd)
     } else {
       // a top-level test result, add it to the summary
-      this.summary.tests.push(new Assert(assert.ok, assert.id, assert.name, assert.time))
+      this.summary.tests.push(toAdd)
     }
   }
 
@@ -163,7 +165,11 @@ export class NodeTapParser extends Transform {
         this._onTestTime(testTime[1])
       } else {
         comment = comment.replace(NodeTapParser._stripNewlines, '')
-        this.current.items.push(new Comment(comment))
+        if (this.current) {
+          this.current.items.push(new Comment(comment))
+        } else {
+          this.summary.extra.lines.push(comment)
+        }
       }
     }
   }

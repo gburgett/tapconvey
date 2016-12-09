@@ -35,12 +35,14 @@ export class Assert implements ResultItem {
   comment: string
   success: boolean
   time: number
+  data: any
 
   constructor(success: boolean, id: number, comment: string, time?: number) {
     this.success = success
     this.comment = comment
     this.id = id
     this.time = time
+    this.data = undefined
   }
 }
 

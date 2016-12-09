@@ -1,6 +1,5 @@
 import 'mocha'
 import { expect } from 'chai'
-import { Readable, Writable } from 'stream'
 
 import * as u from '../utils'
 import { Summary, Test, Assert, Comment, Log } from './results'
@@ -438,6 +437,211 @@ Bail out! # some random error occured!
 
 
 
+
+        done()
+      })
+
+      // act
+      stdin.pipe(instance)
+    })
+  })
+
+  describe('test with assertion failure', () => {
+    const contents = `TAP version 13
+# Subtest: test/node-tap/test_2.js
+    # Subtest: this test fails
+        1..2
+        not ok 1 - this is a failed assert
+          ---
+          found: 3
+          wanted: 4
+          compare: ===
+          at:
+            line: 5
+            column: 5
+            file: test/node-tap/test_2.js
+            type: global
+            function: tap.test.t
+          stack: |
+            tap.test.t (test/node-tap/test_2.js:5:5)
+            Object.<anonymous> (test/node-tap/test_2.js:3:5)
+            run (bootstrap_node.js:420:7)
+            startup (bootstrap_node.js:139:9)
+            bootstrap_node.js:535:3
+          source: |
+            t.equal(3, 4, 'this is a failed assert')
+          ...
+        ok 2 - this is a good assert
+        # failed 1 of 2 tests
+    not ok 1 - this test fails # time=23.149ms
+      ---
+      at:
+        line: 3
+        column: 5
+        file: test/node-tap/test_2.js
+      results:
+        plan:
+          start: 1
+          end: 2
+        count: 2
+        pass: 1
+        ok: false
+        fail: 1
+        time: 23.149
+      source: |
+        tap.test('this test fails', t => {
+      ...
+
+    1..1
+    # failed 1 of 1 tests
+    # time=42.389ms
+not ok 1 - test/node-tap/test_2.js # time=223.122ms
+  ---
+  timeout: 30000
+  file: test/node-tap/test_2.js
+  results:
+    ok: false
+    count: 1
+    pass: 0
+    fail: 1
+    plan:
+      start: 1
+      end: 1
+  exitCode: 1
+  command: /usr/local/bin/node
+  arguments:
+    - test/node-tap/test_2.js
+  ...
+
+1..1
+# failed 1 of 1 tests
+# time=241.388ms
+
+`
+
+    it('should show a failure in the summary', done => {
+      const stdin = u.stringToStream(contents)
+
+      var summaryCount = 0
+      const instance = new NodeTapParser()
+      instance.on('summary', (summary: Summary) => {
+        summaryCount++
+
+        expect(summary.time).to.equal('241.388ms')
+        expect(summary.tests.length).to.equal(1, 'summary.tests.length')
+        expect(summary.tests[0].success).to.equal(false, 'tests[0].success')
+        expect(summary.tests[0].comment).to.equal('test/node-tap/test_2.js', 'tests[0].comment')
+        expect(summary.tests[0].data).to.deep.equal({
+          timeout: 30000,
+          file: 'test/node-tap/test_2.js',
+          results: {
+            ok: false,
+            count: 1,
+            pass: 0,
+            fail: 1,
+            plan: {
+              start: 1,
+              end: 1
+            },
+          },
+          exitCode: 1,
+          command: '/usr/local/bin/node',
+          arguments: ['test/node-tap/test_2.js']
+        }, 'yaml')
+      })
+
+      instance.on('end', () => {
+        expect(summaryCount).to.equal(1)
+        done()
+      })
+
+      // act
+      stdin.pipe(instance)
+      instance.resume()
+    })
+
+    it('should show the failure in the emitted test', done => {
+      const stdin = u.stringToStream(contents)
+
+      var tests: Test[] = []
+      const instance = new NodeTapParser()
+      instance.on('data', (test: Test) => {
+        tests.push(test)
+      })
+
+      instance.on('end', () => {
+        expect(tests).to.have.length(1, 'numTests')
+        expect(tests[0].asserts).to.equal(1, '#asserts')
+        expect(tests[0].successfulAsserts).to.equal(0, '#successes')
+
+        expect(tests[0].items).to.have.length(3, '{test}\\n {assert}\\n {failure comment}')
+        const sub = tests[0].items[1] as Assert
+        expect(sub.success).to.be.false
+        expect(sub.data).to.deep.equal({
+          at: {
+            line: 3,
+            column: 5,
+            file: 'test/node-tap/test_2.js'
+          },
+          results: {
+            plan: {
+              start: 1,
+              end: 2,
+            },
+            count: 2,
+            pass: 1,
+            ok: false,
+            fail: 1,
+            time: 23.149
+          },
+          source: "tap.test('this test fails', t => {\n"
+        })
+
+        done()
+      })
+
+      // act
+      stdin.pipe(instance)
+    })
+
+
+    it('should show the failure in the subtest', done => {
+      const stdin = u.stringToStream(contents)
+
+      var tests: Test[] = []
+      const instance = new NodeTapParser()
+      instance.on('data', (test: Test) => {
+        tests.push(test)
+      })
+
+      instance.on('end', () => {
+        expect(tests).to.have.length(1, 'numTests')
+
+        expect(tests[0].items).to.have.length(3, '{test}\\n {assert}\\n {failure comment}')
+        const sub = tests[0].items[0] as Test
+
+        expect(sub.items).to.have.length(3, '{assert 1}\\n {assert 2}\\n {failure comment}')
+        const ass1 = sub.items[0] as Assert
+        expect(ass1.success).to.be.false
+        expect(ass1.data).to.deep.equal({
+          found: 3,
+          wanted: 4,
+          compare: '===',
+          at: {
+            line: 5,
+            column: 5,
+            file: 'test/node-tap/test_2.js',
+            type: 'global',
+            function: 'tap.test.t'
+          },
+          stack: `tap.test.t (test/node-tap/test_2.js:5:5)
+Object.<anonymous> (test/node-tap/test_2.js:3:5)
+run (bootstrap_node.js:420:7)
+startup (bootstrap_node.js:139:9)
+bootstrap_node.js:535:3
+`,
+          source: "t.equal(3, 4, 'this is a failed assert')\n"
+        })
 
         done()
       })
