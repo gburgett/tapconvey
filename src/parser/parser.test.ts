@@ -2,9 +2,9 @@ import 'mocha'
 import { expect } from 'chai'
 import { Readable, Writable } from 'stream'
 
-import * as u from './utils'
+import * as u from '../utils'
 import { Summary, Test, Assert, Comment, Log } from './results'
-import NodeTapParser from './node-tap-parser'
+import NodeTapParser from './index'
 
 describe('NodeTapParser', () => {
   describe('empty file', () => {

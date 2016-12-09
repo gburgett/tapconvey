@@ -37,7 +37,6 @@ export class NodeTapParser extends Transform {
   }
 
   _transform(chunk: Buffer, encoding: string, callback: (Error, Any) => void) {
-    console.log('toTransform: ', chunk.toString())
     var ret = this.parser.write(chunk, encoding, callback)
 
   }
@@ -85,8 +84,6 @@ export class NodeTapParser extends Transform {
         this.current.items.push(new Log(extra))
       }
     }
-
-    console.log('onExtra: ', extra)
   }
 
   private _onChild(childParser: any) {
@@ -103,7 +100,6 @@ export class NodeTapParser extends Transform {
   }
 
   private _onComplete(results: any) {
-    // console.log('onComplete: ', results)
     if (!this.current) {
       return
     }
@@ -157,7 +153,6 @@ export class NodeTapParser extends Transform {
   private static _TestNameRegexp = /^# Subtest\:\s+(.*)$/im
   private static _TestTimeRegexp = /^# time=(.*)$/im
   private _onComment(comment: string) {
-    // console.log('onComment: ', comment)
     const testName = NodeTapParser._TestNameRegexp.exec(comment)
 
     if (testName) {
