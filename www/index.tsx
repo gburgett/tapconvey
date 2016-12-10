@@ -13,5 +13,5 @@ class App extends React.Component<AppProps, undefined> {
 
 ReactDOM.render(
   <App />,
-  document.getElementById("example")
+  document.getElementById("react-root")
 );

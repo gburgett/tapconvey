@@ -10,12 +10,18 @@ module.exports = {
   // Source maps support ('inline-source-map' also works)
   devtool: 'source-map',
 
+  resolve: {
+    // Look for modules in .ts(x) files first, then .js(x)
+    extensions: ['', '.ts', '.tsx', '.js', '.jsx'],
+  },
+
   // Add the loader for .ts files.
   module: {
     loaders: [
       {
         test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader'
+        // run through ts-loader then babel, so we transform the jsx
+        loaders: ['babel', 'ts-loader']
       },
       {
         test: /\.html$/,
