@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "typings": "src/index.js",
   "scripts": {
+    "dev-www": "webpack-dev-server --inline --config www/webpack.config.js",
     "build-www": "webpack --config www/webpack.config.js -v --display-error-details",
     "test": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts'",
     "test-watch": "mocha -w --compilers ts:ts-node/register --recursive 'src/**/*.test.ts'"
