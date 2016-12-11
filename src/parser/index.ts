@@ -106,7 +106,9 @@ export class NodeTapParser extends Transform {
     this.current.success = results.ok
     this.current.asserts = results.count
     this.current.successfulAsserts = results.pass
-    this.current.bailout = results.bailout
+    if(results.bailout) {
+      this.current.bailout = results.bailout
+    }
 
     if (this.stack.length == 0) {
       // back at the top of the stack - just finished a top-level test
@@ -143,7 +145,9 @@ export class NodeTapParser extends Transform {
 
   private _onAssert(assert: any) {
     const toAdd = new Assert(assert.ok, assert.id, assert.name, assert.time)
-    toAdd.data = assert.diag
+    if(assert.diag) {
+      toAdd.data = assert.diag
+    }
     if (this.current) {
       this.current.items.push(toAdd)
     } else {
