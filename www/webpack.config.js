@@ -4,7 +4,7 @@ module.exports = {
   context: __dirname,
   entry: './index.tsx',
   output: {
-    path: 'dist',
+    path: __dirname + '/dist',
     filename: '[name].js'
   },
   // Source maps support ('inline-source-map' also works)

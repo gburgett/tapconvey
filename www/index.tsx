@@ -1,9 +1,32 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
-import { App } from './app'
+declare var module: { hot: any };
 
-ReactDOM.render(
-  <App />,
-  document.getElementById("react-root")
-);
+var render = () => {
+  const App = require('./app').App
+  ReactDOM.render(
+    <App />,
+    document.getElementById("react-root")
+  );
+}
+
+if (module.hot) {
+  render = () => {
+    const AppContainer = require('react-hot-loader').AppContainer
+    const App = require('./app').App
+
+    ReactDOM.render(
+      <AppContainer>
+        <App />
+      </AppContainer>,
+      document.getElementById("react-root")
+    );
+  }
+
+  // Hot Module Replacement
+  module.hot.accept('./app', render)
+}
+
+
+render();
