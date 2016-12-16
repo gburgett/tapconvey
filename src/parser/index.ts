@@ -48,7 +48,10 @@ export class NodeTapParser extends Transform {
 
   private _doFlush() {
     if (!this.emittedSummary) {
-      this.emit('summary', this.summary)
+      if (this.summary) {
+        this.push(this.summary)
+        this.emit('summary', this.summary)
+      }
       if (this.callback) {
         this.callback(null, this.summary)
         this.summary = null
@@ -106,7 +109,7 @@ export class NodeTapParser extends Transform {
     this.current.success = results.ok
     this.current.asserts = results.count
     this.current.successfulAsserts = results.pass
-    if(results.bailout) {
+    if (results.bailout) {
       this.current.bailout = results.bailout
     }
 
@@ -145,7 +148,7 @@ export class NodeTapParser extends Transform {
 
   private _onAssert(assert: any) {
     const toAdd = new Assert(assert.ok, assert.id, assert.name, assert.time)
-    if(assert.diag) {
+    if (assert.diag) {
       toAdd.data = assert.diag
     }
     if (this.current) {
@@ -198,6 +201,8 @@ export class NodeTapParser extends Transform {
     this.summary = new Summary()
     this.emittedSummary = false
     this.summary.version = version
+    this.emit('start', version)
+    this.push(version)
   }
 }
 

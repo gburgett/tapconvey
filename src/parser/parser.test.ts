@@ -109,23 +109,23 @@ describe('NodeTapParser', () => {
   describe('file with just header', () => {
     const contents = `TAP version 13
 `
-    it('should send no results on data event, but sends summary', (done) => {
+    it('should send no tests on data event, and sends start', (done) => {
       const stdin = u.stringToStream(contents)
 
       const instance = new NodeTapParser()
 
       //act
-      var version
-      instance.on('summary', (chunk: Summary) => {
-        console.log('onSummary', chunk)
-        version = chunk.version
+      var version: number
+      instance.on('start', (chunk: number) => {
+        version = chunk
       })
       instance.on('data', chunk => {
-        expect.fail('should not call data event')
+        if (chunk instanceof Test) {
+          expect.fail('should not have sent any tests on data event')
+        }
       })
       instance.on('end', () => {
-        console.log('version: ', typeof version, version)
-        expect(version).to.equal(13)
+        expect(version).to.equal(13, 'expect version through start event')
         done()
       })
       stdin.pipe(instance)
@@ -161,6 +161,33 @@ describe('NodeTapParser', () => {
       expect(result).to.be.null
     })
 
+    it('should send version and summary on data event', (done) => {
+      const stdin = u.stringToStream(contents)
+
+      const instance = new NodeTapParser()
+
+      //act
+      var version: number[] = []
+      var summary: Summary[] = []
+      instance.on('data', chunk => {
+        if (chunk instanceof Summary) {
+          summary.push(chunk)
+        } else if (typeof (chunk) == 'number') {
+          version.push(chunk)
+        }
+      })
+      instance.on('end', () => {
+        expect(version).to.have.length(1, 'expect only one version from data event')
+        expect(version[0]).to.equal(13, 'expect correct version through data event')
+        expect(summary).to.have.length(1, 'expect summary through data event')
+        const expected = new Summary()
+        expected.version = 13
+        expect(summary[0]).to.deep.equal(expected)
+        done()
+      })
+      stdin.pipe(instance)
+    })
+
   })
 
   describe('file with one good test', () => {
@@ -183,17 +210,18 @@ ok 1 - test/node-tap/test_2.js # time=202.366ms
 
       //act
       var dataCount = 0
-      instance.on('data', (chunk: Test) => {
-        expect(chunk).is.instanceOf(Test)
-        expect(chunk.name).to.equal('test/node-tap/test_2.js')
-        expect(chunk.plan.start).to.equal(1, 'plan.start')
-        expect(chunk.plan.end).to.equal(1, 'plan.end')
-        expect(chunk.asserts).to.equal(1)
-        expect(chunk.successfulAsserts).to.equal(1)
-        expect(chunk.success).to.be.true
-        expect(chunk.time).to.equal('17.336ms')
-        expect(chunk.items[0]).to.deep.equal(new Assert(true, 1, 'this is a good assert'))
-        dataCount++
+      instance.on('data', (chunk) => {
+        if (chunk instanceof Test) {
+          expect(chunk.name).to.equal('test/node-tap/test_2.js')
+          expect(chunk.plan.start).to.equal(1, 'plan.start')
+          expect(chunk.plan.end).to.equal(1, 'plan.end')
+          expect(chunk.asserts).to.equal(1)
+          expect(chunk.successfulAsserts).to.equal(1)
+          expect(chunk.success).to.be.true
+          expect(chunk.time).to.equal('17.336ms')
+          expect(chunk.items[0]).to.deep.equal(new Assert(true, 1, 'this is a good assert'))
+          dataCount++
+        }
       })
       instance.on('end', () => {
         expect(dataCount).to.equal(1)
@@ -254,9 +282,10 @@ ok 2 - test/node-tap/test_3.js # time=194.329ms
 
       //act
       var tests: Test[] = []
-      instance.on('data', (chunk: Test) => {
-        expect(chunk).is.instanceOf(Test)
-        tests.push(chunk)
+      instance.on('data', (chunk) => {
+        if (chunk instanceof Test) {
+          tests.push(chunk)
+        }
       })
       instance.on('end', () => {
         expect(tests.length).to.equal(2, 'tests.length')
@@ -331,9 +360,10 @@ ok 1 - test/node-tap/test_2.js # time=206.12ms
 
       //act
       var tests: Test[] = []
-      instance.on('data', (chunk: Test) => {
-        expect(chunk).is.instanceOf(Test)
-        tests.push(chunk)
+      instance.on('data', (chunk) => {
+        if (chunk instanceof Test) {
+          tests.push(chunk)
+        }
       })
       instance.on('end', () => {
         expect(tests.length).to.equal(1, 'tests.length')
@@ -403,8 +433,10 @@ Bail out! # some random error occured!
 
       var tests: Test[] = []
       const instance = new NodeTapParser()
-      instance.on('data', (data: Test) => {
-        tests.push(data)
+      instance.on('data', (data) => {
+        if (data instanceof Test) {
+          tests.push(data)
+        }
       })
       instance.on('end', () => {
         expect(tests).to.have.length(1, 'tests')
@@ -434,9 +466,6 @@ Bail out! # some random error occured!
         expect(ass1.comment).to.equal('this test bails out', 'assert for test1 name')
         expect(ass1.success).to.equal(false, 'assert for test1 success')
         expect(ass1.time).to.equal(undefined, 'assert for test1 time')
-
-
-
 
         done()
       })
@@ -565,8 +594,10 @@ not ok 1 - test/node-tap/test_2.js # time=223.122ms
 
       var tests: Test[] = []
       const instance = new NodeTapParser()
-      instance.on('data', (test: Test) => {
-        tests.push(test)
+      instance.on('data', (test) => {
+        if (test instanceof Test) {
+          tests.push(test)
+        }
       })
 
       instance.on('end', () => {
@@ -610,8 +641,10 @@ not ok 1 - test/node-tap/test_2.js # time=223.122ms
 
       var tests: Test[] = []
       const instance = new NodeTapParser()
-      instance.on('data', (test: Test) => {
-        tests.push(test)
+      instance.on('data', (test) => {
+        if (test instanceof Test) {
+          tests.push(test)
+        }
       })
 
       instance.on('end', () => {

@@ -22,8 +22,10 @@ describe('running tap test files', () => {
       const instance = runFile('./test/node-tap/test_1.tap.js')
 
       var tests: Test[] = []
-      instance.on('data', (test: Test) => {
-        tests.push(test)
+      instance.on('data', (test) => {
+        if (test instanceof Test) {
+          tests.push(test)
+        }
       })
 
       instance.on('end', () => {
@@ -39,8 +41,10 @@ describe('running tap test files', () => {
       const instance = runFile('./test/node-tap/*.tap.js')
 
       var tests: Test[] = []
-      instance.on('data', (test: Test) => {
-        tests.push(test)
+      instance.on('data', (test) => {
+        if (test instanceof Test) {
+          tests.push(test)
+        }
       })
 
       instance.on('end', () => {
