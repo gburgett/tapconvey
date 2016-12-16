@@ -1,11 +1,10 @@
 import { Summary, Test } from '../src/parser/results'
+import { NodeTapParser } from '../src/parser'
 import * as express from 'express'
 import * as http from 'http'
+import { Writable, Readable } from 'stream'
 
-class TestRun {
-  public summary: Summary
-  public tests: Test[]
-}
+import { TestRun } from './client'
 
 
 const requestLogger: express.RequestHandler = (
@@ -17,60 +16,83 @@ const requestLogger: express.RequestHandler = (
   next();
 }
 
+class ServerWritable extends Writable {
+  private readonly server: Server
+  readonly source: string
 
-export class Server {
-  private lastRun: TestRun
-
-  readonly app: express.Application
-  private runningServer: http.Server
-
-  constructor(app?: express.Application) {
-    this.app = app || express()
-    this.app.use(requestLogger)
-    var routes = express.Router()
-    this._init(routes)
-    this.app.use('/api', routes)
+  constructor(server: Server, source: string) {
+    super({
+      objectMode: true
+    })
+    this.server = server
+    this.source = source
   }
 
-  private _init(routes: express.Router) {
+  _write(chunk, encoding, callback) {
+    if (chunk instanceof Test) {
+      this.server.pushTests(this.source, chunk)
+    } else if (chunk instanceof Summary) {
+      this.server.pushSummary(this.source, chunk)
+    } else if (typeof (chunk) === 'number') {
+      this.server.pushNewTestRun(this.source)
+    } else {
+      callback(new Error(`unkown written object type ${typeof (chunk)} - ${chunk}`))
+      return
+    }
+
+    callback()
+  }
+
+}
+
+
+export class Server {
+  private readonly testRuns = new Map<string, TestRun>()
+
+  constructor() {
+  }
+
+  public init(app: express.Application) {
+    app.use(requestLogger)
+    var routes = express.Router()
+    app.use('/api', routes)
+
     const self = this
-    routes.get('/lastRun', (req, res, next) => {
-      res.write(self._getLastRun())
+    routes.get('/allRuns', (req, res, next) => {
+      const ret = JSON.stringify(self._getAllTestRuns())
+      res.write(ret)
+      res.end()
     })
   }
 
-  public listen(port: string | number) {
-    this.runningServer = this.app.listen(port)
-  }
-
-  public close() {
-    this.runningServer.close()
-    this.runningServer = null
+  public writeableSource(source: string): Writable {
+    return new ServerWritable(this, source)
   }
 
   // Public push data
 
-  public pushTests(...tests: Test[]) {
-    if (!this.lastRun) {
-      this.lastRun = new TestRun()
+  public pushTests(source: string, ...tests: Test[]) {
+    if (!this.testRuns.has(source)) {
+      this.pushNewTestRun(source)
     }
-    this.lastRun.tests.push(...tests)
+    this.testRuns.get(source).tests.push(...tests)
   }
 
-  public pushSummary(summary: Summary) {
-    if (!this.lastRun) {
-      this.lastRun = new TestRun()
+  public pushSummary(source: string, summary: Summary) {
+    if (!this.testRuns.has(source)) {
+      this.pushNewTestRun(source)
     }
-    this.lastRun.summary = summary
+    this.testRuns.get(source).summary = summary
   }
 
-  public pushNewTestRun() {
-    this.lastRun = new TestRun()
+  public pushNewTestRun(source: string) {
+    this.testRuns.set(source, new TestRun())
   }
 
   // Handler methods
 
-  private _getLastRun(): TestRun {
-    return this.lastRun
+  private _getAllTestRuns(): Array<[string, TestRun]> {
+    return [...this.testRuns]
   }
+
 }

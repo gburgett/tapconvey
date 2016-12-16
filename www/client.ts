@@ -3,7 +3,7 @@ import * as Results from '../src/parser/results'
 
 export class TestRun {
   public summary: Results.Summary
-  public tests: Results.Test[]
+  public tests: Results.Test[] = []
 }
 
 export class RequestError extends Error {
@@ -23,10 +23,10 @@ export class Client {
     this.url = url
   }
 
-  public async getLastRun(): Promise<TestRun> {
+  public async getAllRuns(): Promise<Map<string, TestRun>> {
     const self = this
-    const url = self.url + '/lastRun'
-    return new Promise<TestRun>((resolve, reject) => {
+    const url = self.url + '/allRuns'
+    return new Promise<Map<string, TestRun>>((resolve, reject) => {
       request(url, (error, response, body) => {
         if (error) {
           reject(error)
@@ -37,11 +37,15 @@ export class Client {
             resolve(null)
           } else {
             try {
-              const json = JSON.parse(body)
+              const json: Array<any> = JSON.parse(body)
+              const ret = new Map<string, TestRun>()
+              json.forEach(obj => {
+                const run = new TestRun()
+                run.summary = Results.Summary.deserialize(obj[1].summary)
+                run.tests = obj[1].tests.map(Results.Test.deserialize)
+                ret.set(obj[0], run)
+              })
 
-              const ret = new TestRun()
-              ret.summary = Results.Summary.deserialize(json.summary)
-              ret.tests = json.tests.map(Results.Test.deserialize)
               resolve(ret)
             } catch (e) {
               reject(e)

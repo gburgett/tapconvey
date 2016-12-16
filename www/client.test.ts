@@ -4,6 +4,7 @@ import * as express from 'express'
 
 import { Client, TestRun, RequestError } from './client'
 import { Summary, Test, Assert, Comment, Log, Plan } from '../src/parser/results'
+import { Server } from './_testserver'
 
 var jsdom = require('mocha-jsdom')
 var port = 9876
@@ -11,11 +12,11 @@ var port = 9876
 describe('Client', () => {
   jsdom()
 
-  describe('getLastTestRun', () => {
+  describe('getAllRuns', () => {
     it('should throw error on no connection', () => {
       const instance = new Client(`http://localhost:${port}/api`)
 
-      return instance.getLastRun().then(
+      return instance.getAllRuns().then(
         data => {
           expect.fail('should not give data')
         },
@@ -41,13 +42,13 @@ describe('Client', () => {
 
       const instance = new Client(`http://localhost:${p}/api`)
 
-      return instance.getLastRun().then(
+      return instance.getAllRuns().then(
         data => {
           expect.fail('should not give data')
         },
         (error: RequestError) => {
           expect(error).to.be.instanceof(RequestError)
-          expect(error.message).to.equal(`GET http://localhost:${p}/api/lastRun: 404`)
+          expect(error.message).to.equal(`GET http://localhost:${p}/api/allRuns: 404`)
           expect(error.response.statusCode).to.equal(404)
         }
       )
@@ -68,13 +69,13 @@ describe('Client', () => {
 
       const instance = new Client(`http://localhost:${p}/api`)
 
-      return instance.getLastRun().then(
+      return instance.getAllRuns().then(
         data => {
           expect.fail('should not give data')
         },
         (error: RequestError) => {
           expect(error).to.be.instanceof(RequestError)
-          expect(error.message).to.equal(`GET http://localhost:${p}/api/lastRun: 500`)
+          expect(error.message).to.equal(`GET http://localhost:${p}/api/allRuns: 500`)
           expect(error.response.statusCode).to.equal(500)
         }
       )
@@ -95,7 +96,7 @@ describe('Client', () => {
 
       const instance = new Client(`http://localhost:${p}/api`)
 
-      return instance.getLastRun().then(
+      return instance.getAllRuns().then(
         data => {
           expect(data).to.be.null
         },
@@ -120,7 +121,7 @@ describe('Client', () => {
 
       const instance = new Client(`http://localhost:${p}/api`)
 
-      return instance.getLastRun().then(
+      return instance.getAllRuns().then(
         data => {
           expect.fail('should not send data but got: ', data)
         },
@@ -157,22 +158,27 @@ describe('Client', () => {
       ]
 
       const app = express()
-      app.use('/api', (req, res, next) => {
-        const js = JSON.stringify(expected)
-        res.status(200).send(js)
-        res.end()
-      })
+      const testServer = new Server()
+      testServer.init(app)
 
       const p = ++port
-      const server = app.listen(p)
+      const http = app.listen(p)
       after(() => {
-        server.close()
+        http.close()
       })
+
+      testServer.pushNewTestRun('stdin')
+      testServer.pushTests('stdin', ...expected.tests)
+      testServer.pushSummary('stdin', expected.summary)
 
       const instance = new Client(`http://localhost:${p}/api`)
 
-      return instance.getLastRun().then(
-        data => {
+      return instance.getAllRuns().then(
+        map => {
+          expect(map.size).to.equal(1, 'expect map with one source')
+          expect(map.keys().next().value).to.equal('stdin', 'expect single source to be stdin')
+
+          const data = map.get('stdin')
           expect(data).to.deep.equal(expected)
           expect(data).to.be.instanceof(TestRun)
 
