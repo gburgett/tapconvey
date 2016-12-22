@@ -19,24 +19,31 @@ export class Summary {
   }
 }
 
+export enum ResultItemType {
+  Assert,
+  Comment,
+  Log,
+  Test
+}
+
 export abstract class ResultItem {
-  protected readonly __name__
-  constructor(protected name: string) {
-    this.__name__ = name
+  public readonly __type__: ResultItemType
+  constructor(protected type: ResultItemType) {
+    this.__type__ = type
   }
 
   public static deserialize(input: any): ResultItem {
-    switch (input.__name__) {
-      case 'Assert':
+    switch (input.__type__) {
+      case ResultItemType.Assert:
         return Assert.deserialize(input)
-      case 'Comment':
+      case ResultItemType.Comment:
         return Comment.deserialize(input)
-      case 'Log':
+      case ResultItemType.Log:
         return Log.deserialize(input)
-      case 'Test':
+      case ResultItemType.Test:
         return Test.deserialize(input)
       default:
-        throw new Error('cannot deserialize input, missing __name__: ' + input)
+        throw new Error('cannot deserialize input, missing __type__: ' + input)
     }
   }
 }
@@ -55,7 +62,7 @@ export class Test extends ResultItem {
   constructor(id?: number, name?: string, succes?: boolean, asserts?: number,
     successfulAsserts?: number, time?: string, plan?: Plan,
     ...items: Array<ResultItem>) {
-    super('Test')
+    super(ResultItemType.Test)
     this.id = id
     this.name = name
     this.success = succes
@@ -106,7 +113,7 @@ export class Assert extends ResultItem {
   data: any
 
   constructor(success: boolean, id: number, comment: string, time?: number) {
-    super('Assert')
+    super(ResultItemType.Assert)
     this.success = success
     this.comment = comment
     this.id = id
@@ -130,7 +137,7 @@ export class Assert extends ResultItem {
 export class Comment extends ResultItem {
   comment: string
   constructor(comment: string) {
-    super('Comment')
+    super(ResultItemType.Comment)
     this.comment = comment
   }
 
@@ -142,7 +149,7 @@ export class Comment extends ResultItem {
 export class Log extends ResultItem {
   lines: string[]
   constructor(...lines: string[]) {
-    super('Log')
+    super(ResultItemType.Log)
     this.lines = lines || []
   }
 
