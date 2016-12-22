@@ -5,10 +5,11 @@
   "main": "src/index.js",
   "typings": "src/index.js",
   "scripts": {
-    "dev-www": "tap test/**/*.js | ts-node www/dev_server.ts",
-    "build-www": "webpack --config www/webpack.config.js -v --display-error-details",
+    "clean:ts": "rm -r www/*.d.ts www/*.map www/*.js src/*.d.ts src/*.map src/*.js",
+    "dev:www": "tap test/**/*.js | ts-node www/dev_server.ts",
+    "build:www": "webpack --config www/webpack.config.js -v --display-error-details",
     "test": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts' 'www/**/*.test.ts'",
-    "test-watch": "mocha -w --compilers ts:ts-node/register --recursive '**/*.test.ts*'"
+    "test:watch": "mocha -w --compilers ts:ts-node/register --recursive 'www/**/*.test.ts*'"
   },
   "keywords": [
     "tap",
@@ -40,6 +41,9 @@
     "html-loader": "^0.4.4",
     "html-webpack-plugin": "^2.24.1",
     "jsdom": "^9.8.3",
+    "mobx": "^2.7.0",
+    "mobx-react": "^4.0.4",
+    "mobx-react-devtools": "^4.2.10",
     "mocha": "^3.2.0",
     "mocha-jsdom": "^1.1.0",
     "mocha-tap-reporter": "^0.1.3",
