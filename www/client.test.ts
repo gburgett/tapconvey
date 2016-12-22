@@ -2,7 +2,7 @@ import 'mocha'
 import { expect } from 'chai'
 import * as express from 'express'
 
-import { Client, TestRun, RequestError } from './client'
+import { ClientImpl, TestRun, RequestError } from './client'
 import { Summary, Test, Assert, Comment, Log, Plan } from '../src/parser/results'
 import { Server } from './_testserver'
 
@@ -14,7 +14,7 @@ describe('Client', () => {
 
   describe('getAllRuns', () => {
     it('should throw error on no connection', () => {
-      const instance = new Client(`http://localhost:${port}/api`)
+      const instance = new ClientImpl(`http://localhost:${port}/api`)
 
       return instance.getAllRuns().then(
         data => {
@@ -40,7 +40,7 @@ describe('Client', () => {
         server.close()
       })
 
-      const instance = new Client(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:${p}/api`)
 
       return instance.getAllRuns().then(
         data => {
@@ -67,7 +67,7 @@ describe('Client', () => {
         server.close()
       })
 
-      const instance = new Client(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:${p}/api`)
 
       return instance.getAllRuns().then(
         data => {
@@ -94,7 +94,7 @@ describe('Client', () => {
         server.close()
       })
 
-      const instance = new Client(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:${p}/api`)
 
       return instance.getAllRuns().then(
         data => {
@@ -119,7 +119,7 @@ describe('Client', () => {
         server.close()
       })
 
-      const instance = new Client(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:${p}/api`)
 
       return instance.getAllRuns().then(
         data => {
@@ -171,7 +171,7 @@ describe('Client', () => {
       testServer.pushTests('stdin', ...expected.tests)
       testServer.pushSummary('stdin', expected.summary)
 
-      const instance = new Client(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:${p}/api`)
 
       return instance.getAllRuns().then(
         map => {

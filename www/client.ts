@@ -16,7 +16,11 @@ export class RequestError extends Error {
   }
 }
 
-export class Client {
+export interface Client {
+  getAllRuns(): Promise<Map<string, TestRun>>
+}
+
+export class ClientImpl {
   readonly url: string
 
   constructor(url: string) {
