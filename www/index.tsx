@@ -3,10 +3,16 @@ import * as ReactDOM from 'react-dom'
 
 declare var module: { hot: any };
 
+import { Client, ClientImpl } from './client'
+import { TestRunList } from './TestRunList'
+
+const client = new ClientImpl('http://localhost:8080')
+const store = new TestRunList(client)
+
 var render = () => {
   const App = require('./app').App
   ReactDOM.render(
-    <App />,
+    <App store={store} />,
     document.getElementById("react-root")
   );
 }
@@ -18,7 +24,7 @@ if (module.hot) {
 
     ReactDOM.render(
       <AppContainer>
-        <App />
+        <App store={store} />
       </AppContainer>,
       document.getElementById("react-root")
     );

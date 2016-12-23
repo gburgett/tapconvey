@@ -23,7 +23,7 @@ describe('<App />', () => {
 
     it('renders the header message', () => {
       const mock = new TestRunList(undefined)
-      const app = shallow(<App runs={mock} />)
+      const app = shallow(<App store={mock} />)
 
       expect(app.find('h2').text()).to.equal('Tapconvey')
     })
@@ -32,7 +32,7 @@ describe('<App />', () => {
       const mock = new TestRunList(undefined, asMap<TestRun>({
         'stdin': run
       }))
-      const app = shallow(<App runs={mock} />)
+      const app = shallow(<App store={mock} />)
 
       const view = app.find('TestRunView')
       expect(view.prop('run')).to.equal(run)

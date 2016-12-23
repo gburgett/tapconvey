@@ -6,14 +6,14 @@ import { TestRun } from './client'
 import { TestRunView } from './TestRunView'
 
 export interface AppProps {
-  runs: TestRunList
+  store: TestRunList
 }
 
 export class App extends React.Component<AppProps, undefined> {
   render() {
     var testRuns
 
-    const stdin = this.props.runs.stdin
+    const stdin = this.props.store.stdin
     if (stdin && stdin.run) {
       testRuns = this.renderTestRun(stdin.source, stdin.run)
     } else {
