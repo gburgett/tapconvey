@@ -135,4 +135,70 @@ describe('<TestView />', () => {
       expect(root.hasClass('test-bailout')).to.be.true
     })
   })
+
+  describe('successful test with one subtest', () => {
+    const test = new Test(
+      1,
+      'fake test',
+      true,
+      1,
+      1,
+      '123ms',
+      new Plan(0, 1),
+      new Test(
+        1,
+        'subtest 1',
+        true,
+        1,
+        1,
+        '100ms',
+        new Plan(0, 1),
+        new Assert(
+          true,
+          1,
+          'assert 1'
+        )
+      ),
+      new Assert(
+        true,
+        2,
+        'subtest 1'
+      )
+    )
+
+    it('renders the header message', () => {
+      //act
+      const view = shallow(<TestView test={test} />)
+
+      const headerText = view.find('.test-header div').text()
+      expect(headerText).to.contain('fake test')
+      expect(headerText).to.contain('1 / 1')
+    })
+
+    it('renders an inner test-view', () => {
+      //act
+      const view = shallow(<TestView test={test} />)
+      const inner = view.find('TestView')
+
+      expect(inner.length).to.equal(1)
+    })
+
+    it('renders inner test-view header', () => {
+      //act
+      const view = shallow(<TestView test={test} />)
+      const inner = view.find('TestView').dive()
+
+      const headerText = inner.find('.test-header').text()
+      expect(headerText).to.contain('subtest 1')
+      expect(headerText).to.contain('1 / 1')
+    })
+
+    it('renders inner test-view with key equal to test id', () => {
+      //act
+      const view = shallow(<TestView test={test} />)
+      const inner = view.find('TestView')
+
+      expect(inner.key()).to.equal('test-1')
+    })
+  })
 })

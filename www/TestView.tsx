@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
 
-import { Test, ResultItem } from '../src/parser/results'
+import { Test, ResultItem, ResultItemType } from '../src/parser/results'
 
 @observer
 export class TestView extends React.Component<{ test: Test }, undefined> {
-
 
   render() {
     const {test} = this.props
@@ -43,11 +42,16 @@ export class TestView extends React.Component<{ test: Test }, undefined> {
     </div>)
   }
 
-  renderItem(item: ResultItem) {
+  renderItem(item: ResultItem, index: number) {
     switch (item.__type__) {
 
+      case ResultItemType.Test:
+        if (item instanceof Test) {
+          return (<TestView test={item} key={'test-' + item.id} />)
+        }
+
       default:
-        return (<pre>{JSON.stringify(item)}</pre>)
+        return (<pre key={'idx-' + index}>{JSON.stringify(item)}</pre>)
     }
 
     // throw new Error('should be unreachable')
