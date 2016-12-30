@@ -26,6 +26,10 @@ module.exports = {
       {
         test: /\.html$/,
         loader: 'html'
+      },
+      {
+        test: /\.json$/,
+        loader: 'json'
       }
     ],
     preLoaders: [

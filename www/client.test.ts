@@ -47,8 +47,8 @@ describe('Client', () => {
           expect.fail('should not give data')
         },
         (error: RequestError) => {
-          expect(error).to.be.instanceof(RequestError)
-          expect(error.message).to.equal(`GET http://localhost:${p}/api/allRuns: 404`)
+          expect(error).to.be.instanceof(Error)
+          expect(error.message).to.equal(`Not Found`)
           expect(error.response.statusCode).to.equal(404)
         }
       )
@@ -74,8 +74,8 @@ describe('Client', () => {
           expect.fail('should not give data')
         },
         (error: RequestError) => {
-          expect(error).to.be.instanceof(RequestError)
-          expect(error.message).to.equal(`GET http://localhost:${p}/api/allRuns: 500`)
+          expect(error).to.be.instanceof(Error)
+          expect(error.message).to.equal(`Internal Server Error`)
           expect(error.response.statusCode).to.equal(500)
         }
       )

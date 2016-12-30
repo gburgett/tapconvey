@@ -60,6 +60,7 @@ export class Server {
     const self = this
     routes.get('/allRuns', (req, res, next) => {
       const ret = JSON.stringify(self._getAllTestRuns())
+      res.contentType('application/json')
       res.write(ret)
       res.end()
     })

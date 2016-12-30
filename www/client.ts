@@ -1,4 +1,4 @@
-import * as request from 'request'
+import * as request from 'superagent'
 import * as Results from '../src/parser/results'
 
 export class TestRun {
@@ -31,32 +31,43 @@ export class ClientImpl {
     const self = this
     const url = self.url + '/allRuns'
     return new Promise<Map<string, TestRun>>((resolve, reject) => {
-      request(url, (error, response, body) => {
-        if (error) {
-          reject(error)
-        } else if (response.statusCode < 200 || response.statusCode >= 300) {
-          reject(new RequestError(`GET ${url}: ${response.statusCode}`, response))
-        } else {
-          if (!body || body.length == 0) {
-            resolve(null)
+      request
+        .get(url)
+        .end((error, response) => {
+          if (error) {
+            reject(error)
+          } else if (response.status < 200 || response.status >= 300) {
+            reject(new RequestError(`GET ${url}: ${response.status}`, response))
           } else {
-            try {
-              const json: Array<any> = JSON.parse(body)
-              const ret = new Map<string, TestRun>()
-              json.forEach(obj => {
-                const run = new TestRun()
-                run.summary = Results.Summary.deserialize(obj[1].summary)
-                run.tests = obj[1].tests.map(Results.Test.deserialize)
-                ret.set(obj[0], run)
-              })
+            var body
 
-              resolve(ret)
-            } catch (e) {
-              reject(e)
+            if (Object.keys(response.body).length === 0 && response.text.length > 0) {
+              try {
+                body = JSON.parse(response.text)
+              } catch (e) {
+                reject(e)
+                return
+              }
+            } else {
+              body = response.body
             }
+
+            if (Object.keys(response.body).length === 0) {
+              resolve(null)
+              return
+            }
+
+            const ret = new Map<string, TestRun>()
+            body.forEach(obj => {
+              const run = new TestRun()
+              run.summary = Results.Summary.deserialize(obj[1].summary)
+              run.tests = obj[1].tests.map(Results.Test.deserialize)
+              ret.set(obj[0], run)
+            })
+
+            resolve(ret)
           }
-        }
-      })
+        })
     })
   }
 
