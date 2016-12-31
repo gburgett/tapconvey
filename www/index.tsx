@@ -6,7 +6,7 @@ declare var module: { hot: any };
 import { Client, ClientImpl } from './client'
 import { TestRunList } from './TestRunList'
 
-const client = new ClientImpl('http://localhost:8080')
+const client = new ClientImpl('http://localhost:8080/api')
 const store = new TestRunList(client)
 
 var render = () => {

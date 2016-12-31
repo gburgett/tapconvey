@@ -8,10 +8,14 @@ export class TestRunList {
 
   /* gets the test run from STDIN, which overrides all other runs */
   @computed get stdin(): { source: string, run: TestRun } {
-    return {
-      source: 'stdin',
-      run: this.testRuns.get('stdin')
+    const run = this.testRuns.get('stdin')
+    if (run) {
+      return {
+        source: 'stdin',
+        run: run
+      }
     }
+    return undefined
   }
 
   constructor(client: Client, runs?: ObservableMap<TestRun>) {
