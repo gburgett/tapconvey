@@ -8,8 +8,10 @@
     "clean:ts": "rm -r www/*.d.ts www/*.map www/*.js src/*.d.ts src/*.map src/*.js",
     "dev:www": "tap test/**/*.js | ts-node www/dev_server.ts",
     "build:www": "webpack --config www/webpack.config.js -v --display-error-details",
-    "test": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts' 'www/**/*.test.ts'",
-    "test:watch": "nodemon -e ts,tsx --exec \"mocha --compilers ts:ts-node/register --recursive '**/*.test.ts*'\""
+    "test:src": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts'",
+    "test:www": "mocha --compilers ts:ts-node/register --recursive 'www/**/*.test.ts?'",
+    "test": "npm run test:src && npm run test:www",
+    "watch": "nodemon -e ts,tsx --exec \"npm run $1\""
   },
   "keywords": [
     "tap",
