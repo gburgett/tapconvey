@@ -5,6 +5,8 @@ import * as u from '../utils'
 import { Summary, Test, Assert, Comment, Log } from './results'
 import NodeTapParser from './index'
 
+const debug = require('debug')('tapconvey:parser')
+
 describe('NodeTapParser', () => {
   describe('empty file', () => {
     it('should send no results on data event', (done) => {
@@ -196,7 +198,7 @@ describe('NodeTapParser', () => {
     1..1
     ok 1 - this is a good assert
     # time=17.336ms
-ok 1 - test/node-tap/test_2.js # time=202.366ms
+ok 2 - test/node-tap/test_2.js # time=202.366ms
 
 1..1
 # time=215.537ms
@@ -213,12 +215,13 @@ ok 1 - test/node-tap/test_2.js # time=202.366ms
       instance.on('data', (chunk) => {
         if (chunk instanceof Test) {
           expect(chunk.name).to.equal('test/node-tap/test_2.js')
+          expect(chunk.id).to.equal(2)
           expect(chunk.plan.start).to.equal(1, 'plan.start')
           expect(chunk.plan.end).to.equal(1, 'plan.end')
           expect(chunk.asserts).to.equal(1)
           expect(chunk.successfulAsserts).to.equal(1)
           expect(chunk.success).to.be.true
-          expect(chunk.time).to.equal('17.336ms')
+          expect(chunk.time).to.equal('202.366ms')
           expect(chunk.items[0]).to.deep.equal(new Assert(true, 1, 'this is a good assert'))
           dataCount++
         }
@@ -240,7 +243,7 @@ ok 1 - test/node-tap/test_2.js # time=202.366ms
         expect(summary.time).to.equal('215.537ms', 'summary.time')
         expect(summary.tests.length).to.equal(1, 'summary.tests.length')
         expect(summary.tests[0].success).to.be.true
-        expect(summary.tests[0].id).to.equal(1, 'tests[0].id')
+        expect(summary.tests[0].id).to.equal(2, 'tests[0].id')
         expect(summary.tests[0].time).to.equal(202.366, 'tests[0].time')
         expect(summary.tests[0].comment).to.equal('test/node-tap/test_2.js', 'tests[0].comment')
       })
@@ -293,12 +296,13 @@ ok 2 - test/node-tap/test_3.js # time=194.329ms
         expect(tests[0].name).to.equal('test/node-tap/test_2.js', 'test[0].name')
 
         expect(tests[1].name).to.equal('test/node-tap/test_3.js', 'test[1].name')
+        expect(tests[1].id).to.equal(2)
         expect(tests[1].plan.start).to.equal(1, 'plan.start')
         expect(tests[1].plan.end).to.equal(2, 'plan.end')
         expect(tests[1].asserts).to.equal(2, 'asserts')
         expect(tests[1].successfulAsserts).to.equal(2, 'successfulAsserts')
         expect(tests[1].success).to.be.true
-        expect(tests[1].time).to.equal('17.988ms', 'time')
+        expect(tests[1].time).to.equal('194.329ms', 'time')
         expect(tests[1].items[0]).to.deep.equal(new Assert(true, 1, 'this is a good assert for #3'))
         expect(tests[1].items[1]).to.deep.equal(new Assert(true, 2, 'this is a good assert for #4'))
 
@@ -323,10 +327,10 @@ ok 2 - test/node-tap/test_3.js # time=194.329ms
         expect(test0.time).to.equal(198.802, 'test0.time')
         expect(test0.success).to.be.true
 
-        const test1 = summary.tests[0]
-        expect(test1.id).to.equal(1, 'test1.id')
-        expect(test1.comment).to.equal('test/node-tap/test_2.js', 'test1.comment')
-        expect(test1.time).to.equal(198.802, 'test1.time')
+        const test1 = summary.tests[1]
+        expect(test1.id).to.equal(2, 'test1.id')
+        expect(test1.comment).to.equal('test/node-tap/test_3.js', 'test1.comment')
+        expect(test1.time).to.equal(194.329, 'test1.time')
         expect(test1.success).to.be.true
 
         done()
@@ -439,6 +443,7 @@ Bail out! # some random error occured!
         }
       })
       instance.on('end', () => {
+        debug(tests)
         expect(tests).to.have.length(1, 'tests')
 
         expect(tests[0].success).to.be.false

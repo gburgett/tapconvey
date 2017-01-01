@@ -1,12 +1,15 @@
 import { Transform } from 'stream'
 import { Summary, Test, Plan, Assert, Comment, Log } from './results'
 
+const debug = require('debug')('tapconvey:parser')
+
 /*
   Transform a stream of TAP formatted input
   into a Results object.
 */
 export class NodeTapParser extends Transform {
   private current: Test
+  private toFinalize: Test
   private summary: Summary
   private emittedSummary: boolean
   private stack: Test[] = []
@@ -60,6 +63,13 @@ export class NodeTapParser extends Transform {
     }
   }
 
+  private _pushFinalized() {
+    if (this.stack.length == 0 && this.current == null) {
+      this.push(this.toFinalize)
+    }
+    this.toFinalize = null
+  }
+
   private _error(error: Error) {
     this.emit('error', error)
     this._doFlush()
@@ -92,6 +102,11 @@ export class NodeTapParser extends Transform {
   private _onChild(childParser: any) {
     const self = this
 
+    if (this.toFinalize) {
+      // never got a finalization assert, push what we got
+      this._pushFinalized()
+    }
+
     if (self.current) {
       // a child test, not a top-level test
       self.stack.push(self.current)
@@ -113,9 +128,11 @@ export class NodeTapParser extends Transform {
       this.current.bailout = results.bailout
     }
 
+    // test isn't done yet, expecting a final assert to sum it up
+    this.toFinalize = this.current
+
     if (this.stack.length == 0) {
       // back at the top of the stack - just finished a top-level test
-      this.push(this.current)
       if (results.bailout) {
         this.summary.bailout = results.bailout
         this.summary.tests.push(new Assert(false, -1, this.current.name))
@@ -133,6 +150,11 @@ export class NodeTapParser extends Transform {
   }
 
   private _onBailout(reason: string) {
+    if (this.toFinalize) {
+      // no finalization asserts if we're bailing out - it all just pops up the stack
+      this._pushFinalized()
+    }
+
     if (!this.current) {
       // we followed the bailout to the top of the stack,
       // finish the process
@@ -151,6 +173,17 @@ export class NodeTapParser extends Transform {
     if (assert.diag) {
       toAdd.data = assert.diag
     }
+
+    if (this.toFinalize) {
+      // this assert is a summary of the previous test.  Copy some authoritative info.
+      this.toFinalize.id = toAdd.id,
+        this.toFinalize.name = toAdd.comment
+      if (toAdd.time) {
+        this.toFinalize.time = toAdd.time.toString() + 'ms'
+      }
+      this._pushFinalized()
+    }
+
     if (this.current) {
       this.current.items.push(toAdd)
     } else {

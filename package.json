@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "typings": "src/index.js",
   "scripts": {
-    "clean:ts": "rm -r www/*.d.ts www/*.map www/*.js src/*.d.ts src/*.map src/*.js",
+    "clean:ts": "find src www -type f -name '*.ts' ! -name '*.d.ts' | sed 's/\\.ts$//' | xargs -I file find file.map file.js file.d.ts -delete",
     "dev:www": "tap test/**/*.js | ts-node www/dev_server.ts",
     "build:www": "webpack --config www/webpack.config.js -v --display-error-details",
     "test:src": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts'",
@@ -66,6 +66,7 @@
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
+    "debug": "^2.6.0",
     "express": "^4.14.0",
     "nodemon": "^1.11.0",
     "tap-parser": "^3.0.4"
