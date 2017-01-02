@@ -1,5 +1,7 @@
 ## Tapconvey
 
+[![Build Status](https://travis-ci.org/gburgett/tapconvey.svg?branch=master)](https://travis-ci.org/gburgett/tapconvey)
+
 TapConvey is like [GoConvey](https://github.com/smartystreets/goconvey) for anything that 
 produces [TAP](https://testanything.org/) output.  It reads TAP-formatted test results from 
 the command line and launches a web interface to display the results.
