@@ -4,6 +4,9 @@ import { TestRunList } from './TestRunList'
 import { TestRun } from './client'
 
 import { TestRunView } from './TestRunView'
+import { Overall } from './overall'
+
+const styles = require('./app.scss')
 
 export interface AppProps {
   store: TestRunList
@@ -18,7 +21,6 @@ export class App extends React.Component<AppProps, any> {
     const self = this
     this.props.store.update()
       .then(() => {
-        console.log('finished update')
         self.setState({
           stdin: self.props.store.stdin.run
         },
@@ -53,17 +55,19 @@ export class App extends React.Component<AppProps, any> {
     const stdin = this.props.store.stdin
     if (stdin && stdin.run) {
       testRuns = this.renderTestRun(stdin.source, stdin.run)
-    } else {
-      testRuns = <h3>Waiting on input from stdin...</h3>
     }
+
+    const summary = stdin
+      ? stdin.run.summary
+      : undefined
 
     return (
       <div>
-        <div>
-          <h2>Tapconvey</h2>
-        </div>
-        <div>
-          {testRuns}
+        <Overall summary={summary} />
+        <div className='frame'>
+          <div className='col'>
+            {testRuns}
+          </div>
         </div>
       </div>
     )

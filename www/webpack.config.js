@@ -30,6 +30,14 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json'
+      },
+      {
+        test: /\.scss$/,
+        loaders: [
+          'style',
+          'css?sourceMap',
+          'sass?sourceMap'
+        ]
       }
     ],
     preLoaders: [

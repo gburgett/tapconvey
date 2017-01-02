@@ -21,11 +21,11 @@ describe('<App />', () => {
     run.summary.version = 13
     run.summary.time = '245ms'
 
-    it('renders the header message', () => {
+    it('renders the Overall component', () => {
       const mock = new TestRunList(undefined)
       const app = shallow(<App store={mock} />)
 
-      expect(app.find('h2').text()).to.equal('Tapconvey')
+      expect(app.find('Overall').length).to.equal(1)
     })
 
     it('renders a TestRunView with the test run', () => {

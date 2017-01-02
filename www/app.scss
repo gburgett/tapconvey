@@ -1,0 +1,21 @@
+.frame .col {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+
+	border-right-width: 1px;
+	border-right-style: solid;
+	float: left;
+	height: 100%;
+	overflow-y: auto;
+
+    border-color: #33B5E5
+}
+
+.frame .col:first-child {
+	border-left: none;
+}
+
+.frame .col:last-child {
+	border-right: none;
+}

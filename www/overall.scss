@@ -1,0 +1,46 @@
+.status {
+    line-height: 1em;
+	font-family: 'Orbitron', monospace;
+	text-align: center;
+}
+
+.overall {
+	padding: 50px 0 15px;
+	z-index: 50;
+    text-align: center;
+    color: whitesmoke;
+    box-shadow: inset 0 150px 100px -110px rgba(0, 0, 0, .5);
+
+    .status {
+        font-size: 46px;
+        letter-spacing: 5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+}
+
+.summary {
+    padding-top: 5px;
+    font-size: 20px;
+    text-align: center;
+
+    .logo {
+        float: left;
+    }
+}
+
+.overall-waiting {
+    background-color: dodgerblue
+}
+
+.overall-pass {
+    background: #688E00;
+}
+
+.overall-fail {
+    	background: #DB8700;
+}
+
+.overall-bailout {
+    	background: #A80000;
+}
