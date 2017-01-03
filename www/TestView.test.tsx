@@ -44,7 +44,7 @@ describe('<TestView />', () => {
       1,
       1,
       '123ms',
-      new Plan(0, 0),
+      new Plan(1, 1),
       new Assert(
         true,
         1,
@@ -58,6 +58,15 @@ describe('<TestView />', () => {
 
       const headerText = view.find('.test-header div span').text()
       expect(headerText).to.contain('1 / 1')
+    })
+
+    it('renders the assert view', () => {
+      //act
+      const view = shallow(<TestView test={test} />)
+
+      const assert = view.find('AssertView')
+      expect(assert).to.have.length(1)
+      expect(assert.prop('assert')).to.equal(test.items[0], 'assert property')
     })
 
     it('renders with the test-success class', () => {
@@ -80,7 +89,11 @@ describe('<TestView />', () => {
       0,
       '123ms',
       new Plan(0, 1),
-      // no items
+      new Assert(
+        false,
+        1,
+        'fake assert'
+      )
     )
 
     it('renders the header message', () => {

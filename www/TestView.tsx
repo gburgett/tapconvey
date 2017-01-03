@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
 
-import { Test, ResultItem, ResultItemType } from '../src/parser/results'
+import { Test, Assert, ResultItem, ResultItemType } from '../src/parser/results'
+import { AssertView } from './AssertView'
 
 @observer
 export class TestView extends React.Component<{ test: Test }, undefined> {
@@ -49,11 +50,14 @@ export class TestView extends React.Component<{ test: Test }, undefined> {
         if (item instanceof Test) {
           return (<TestView test={item} key={'test-' + item.id} />)
         }
+        break
 
-      default:
-        return (<pre key={'idx-' + index}>{JSON.stringify(item)}</pre>)
+      case ResultItemType.Assert:
+        if (item instanceof Assert) {
+          return (<AssertView assert={item} key={'assert-' + item.id} />)
+        }
     }
 
-    // throw new Error('should be unreachable')
+    return (<pre key={'idx-' + index}>{JSON.stringify(item)}</pre>)
   }
 }

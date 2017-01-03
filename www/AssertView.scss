@@ -1,0 +1,37 @@
+.assert {
+    .assert-icon:before {
+        padding: 10px;
+        font-size: 36px;
+        
+    }
+
+    .assert-comment {
+        font-size: 18px;
+    }
+
+    border-top: 1px dashed rgba(255, 255, 255, .08);
+    border-bottom: 1px dashed rgba(255, 255, 255, .08);
+}
+
+.assert-success {
+    .assert-icon:before {
+       content: '\2714';
+       color: #688E00;
+    }
+
+    border-left: 6px solid #688E00;
+}
+
+.assert-fail {
+    .assert-icon:before {
+       content: '\2718';
+       color: #DB8700;
+    }
+
+    border-left: 6px solid #DB8700;
+}
+
+.assert-comment {
+    border-left: 1px dashed rgba(255, 255, 255, .08);
+    padding-left: 4px
+}
