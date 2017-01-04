@@ -1,6 +1,7 @@
 ## Tapconvey
 
 [![Build Status](https://travis-ci.org/gburgett/tapconvey.svg?branch=master)](https://travis-ci.org/gburgett/tapconvey)
+[![Coverage Status](https://coveralls.io/repos/github/gburgett/tapconvey/badge.svg?branch=master)](https://coveralls.io/github/gburgett/tapconvey?branch=master)
 
 TapConvey is like [GoConvey](https://github.com/smartystreets/goconvey) for anything that 
 produces [TAP](https://testanything.org/) output.  It reads TAP-formatted test results from 
