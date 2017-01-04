@@ -20,8 +20,7 @@ describe('testRunList', () => {
       const stdin = instance.stdin
 
       //assert
-      expect(stdin.source).to.equal('stdin')
-      expect(stdin.run).to.be.undefined
+      expect(stdin).to.be.undefined
     })
 
     it('should return nothing when tests doesnt include stdin source', () => {
@@ -34,8 +33,7 @@ describe('testRunList', () => {
       const stdin = instance.stdin
 
       //assert
-      expect(stdin.source).to.equal('stdin')
-      expect(stdin.run).to.be.undefined
+      expect(stdin).to.be.undefined
     })
 
     it('should return stdin test when it exists', () => {
