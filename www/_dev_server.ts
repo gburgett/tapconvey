@@ -1,3 +1,8 @@
+/*
+ * _dev_server.ts: cli utility serving the React app with hot reloading for development.
+ *   ignored by Istanbul
+ */
+
 import { Application, Router, Request, Response, NextFunction } from 'express'
 import * as webpack from 'webpack'
 import * as path from 'path'
@@ -26,15 +31,15 @@ const testApi = new Server()
 var compiler = webpack(config)
 var server = new WebpackDevServer(compiler, {
   hot: true,
-  setup: function(app: Application) {
+  setup: function (app: Application) {
     //setup test API
     testApi.init(app)
   }
 })
 
-server.listen(8080, "localhost", function() { })
+server.listen(8080, "localhost", function () { })
 
-process.argv.forEach(function(val) {
+process.argv.forEach(function (val) {
   // find and process the file
   if (path.extname(val) === '.tap') {
     fs.createReadStream(val)

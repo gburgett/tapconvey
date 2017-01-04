@@ -1,3 +1,8 @@
+/*
+ * _testserver.ts: utility exposing test data as an API for use in tests
+ *   ignored by Istanbul
+ */
+
 import { Summary, Test } from '../src/parser/results'
 import { NodeTapParser } from '../src/parser'
 import * as express from 'express'

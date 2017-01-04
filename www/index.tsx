@@ -1,3 +1,8 @@
+/* 
+ * index.tsx: entry point and composition root for React app 
+ *   ignored by Istanbul
+ */
+
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 

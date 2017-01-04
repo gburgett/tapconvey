@@ -6,7 +6,7 @@
   "typings": "src/index.js",
   "scripts": {
     "clean:ts": "find src www -type f -name '*.ts' ! -name '*.d.ts' | sed 's/\\.ts$//' | xargs -I file find file.map file.js file.d.ts -delete",
-    "dev:www": "tap test/**/*.js | ts-node www/dev_server.ts",
+    "dev:www": "tap test/**/*.js | ts-node www/_dev_server.ts",
     "build:www": "webpack --config www/webpack.config.js -v --display-error-details",
     "test:src": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts?(x)'",
     "test:www": "mocha --require ignore-styles --compilers ts:ts-node/register --recursive 'www/**/*.test.ts?(x)'",

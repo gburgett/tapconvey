@@ -5,9 +5,10 @@
   ],
   "exclude": [
     "**/*.test.ts?(x)",
+    "src/index.ts",
     "www/index.tsx",
     "www/_testserver.ts",
-    "www/dev_server.ts"
+    "www/_dev_server.ts"
   ],
   "extension": [
     ".ts",
