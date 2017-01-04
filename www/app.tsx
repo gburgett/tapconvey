@@ -8,6 +8,10 @@ import { Overall } from './overall'
 
 const styles = require('./app.scss')
 
+export var TIMEOUTS = {
+  full_update: 1000
+}
+
 export interface AppProps {
   store: TestRunList
 }
@@ -18,21 +22,22 @@ export class App extends React.Component<AppProps, any> {
 
   // background tasks
   fullUpdate() {
+    console.log('fullUpdate')
     const self = this
-    this.props.store.update()
-      .then(() => {
-        self.setState({
-          stdin: self.props.store.stdin.run
-        },
-          self.tickFullUpdate.bind(self))
+    const store = self.props.store
+    store.update().then(() => {
+      self.setState({
+        stdin: store.stdin ? store.stdin.run : undefined
       },
+        self.tickFullUpdate.bind(self))
+    },
       error => {
         console.log('error getting full update', error)
       })
   }
 
   tickFullUpdate() {
-    this.timeoutFullUpdate = setTimeout(this.fullUpdate.bind(this), 5000)
+    this.timeoutFullUpdate = setTimeout(this.fullUpdate.bind(this), TIMEOUTS.full_update)
   }
 
   stopTasks() {
@@ -42,7 +47,7 @@ export class App extends React.Component<AppProps, any> {
   // lifecycle methods
   componentDidMount() {
     //start tasks
-    this.tickFullUpdate()
+    this.fullUpdate()
   }
 
   componentWillUnmount() {

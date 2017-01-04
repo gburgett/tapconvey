@@ -7,11 +7,7 @@ import { TestRunView } from './TestRunView'
 import { TestRun } from './client'
 import { Summary, Test, Plan, Assert } from '../src/parser/results'
 
-var jsdom = require('mocha-jsdom')
-
 describe('<TestRunView />', () => {
-
-  jsdom()
 
   describe('run with no tests', () => {
     const run = new TestRun()

@@ -6,11 +6,7 @@ import { shallow } from 'enzyme'
 import { AssertView } from './AssertView'
 import { Test, Plan, Assert } from '../src/parser/results'
 
-var jsdom = require('mocha-jsdom')
-
 describe('<AssertView />', function () {
-
-  jsdom()
 
   describe('successful assert', function () {
 

@@ -6,10 +6,7 @@ import { shallow } from 'enzyme'
 import { Overall } from './overall'
 import { Summary, Assert } from '../src/parser/results'
 
-var jsdom = require('mocha-jsdom')
-
 describe('<Overall />', () => {
-    jsdom()
 
     describe('undefined summary', () => {
 

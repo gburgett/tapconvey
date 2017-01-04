@@ -6,11 +6,9 @@ import { ClientImpl, TestRun, RequestError } from './client'
 import { Summary, Test, Assert, Comment, Log, Plan } from '../src/parser/results'
 import { Server } from './_testserver'
 
-var jsdom = require('mocha-jsdom')
 var port = 9876
 
 describe('Client', () => {
-  jsdom()
 
   describe('getAllRuns', () => {
     it('should throw error on no connection', () => {
@@ -27,7 +25,7 @@ describe('Client', () => {
       )
     })
 
-    it('should throw error on 404', function() {
+    it('should throw error on 404', function () {
       const app = express()
       app.use('/api', (req, res, next) => {
         res.status(404).send('Not Found')
@@ -54,7 +52,7 @@ describe('Client', () => {
       )
     })
 
-    it('should throw error on 500', function() {
+    it('should throw error on 500', function () {
       const app = express()
       app.use('/api', (req, res, next) => {
         res.status(500).send('Internal Server Error')
@@ -81,7 +79,7 @@ describe('Client', () => {
       )
     })
 
-    it('should return null if no data', function() {
+    it('should return null if no data', function () {
       const app = express()
       app.use('/api', (req, res, next) => {
         res.status(200).send()
@@ -106,7 +104,7 @@ describe('Client', () => {
       )
     })
 
-    it('should return error on bad data', function() {
+    it('should return error on bad data', function () {
       const app = express()
       app.use('/api', (req, res, next) => {
         res.status(200).send('{ \"this starts out\" : \"as some json\" but... ')
@@ -131,7 +129,7 @@ describe('Client', () => {
       )
     })
 
-    it('should return downloaded data', function() {
+    it('should return downloaded data', function () {
       const expected = new TestRun()
       expected.summary = (() => {
         const s = new Summary()

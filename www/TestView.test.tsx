@@ -6,11 +6,7 @@ import { shallow } from 'enzyme'
 import { TestView } from './TestView'
 import { Test, Plan, Assert } from '../src/parser/results'
 
-var jsdom = require('mocha-jsdom')
-
 describe('<TestView />', () => {
-
-  jsdom()
 
   describe('test with no items', () => {
     it('renders the header message', () => {

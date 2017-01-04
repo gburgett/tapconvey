@@ -7,7 +7,6 @@ import { Client, TestRun, RequestError } from './client'
 import { Summary, Test, Assert, Comment, Log, Plan } from '../src/parser/results'
 import { TestRunList } from './TestRunList'
 
-var jsdom = require('mocha-jsdom')
 var port = 9876
 
 describe('testRunList', () => {
