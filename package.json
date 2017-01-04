@@ -10,7 +10,9 @@
     "build:www": "webpack --config www/webpack.config.js -v --display-error-details",
     "test:src": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts?(x)'",
     "test:www": "mocha --require ignore-styles --compilers ts:ts-node/register --recursive 'www/**/*.test.ts?(x)'",
-    "test": "npm run test:src && npm run test:www",
+    "test:all": "npm run test:src && npm run test:www",
+    "test": "npm run cover && nyc check-coverage --statements 90 --lines 90",
+    "cover": "nyc npm run test:all",
     "watch": "nodemon -e ts,tsx --exec \"npm run $1\""
   },
   "keywords": [
@@ -46,6 +48,7 @@
     "html-loader": "^0.4.4",
     "html-webpack-plugin": "^2.24.1",
     "ignore-styles": "^5.0.1",
+    "istanbul": "^0.4.5",
     "js-yaml": "^3.7.0",
     "jsdom": "^9.8.3",
     "json-loader": "^0.5.4",
@@ -56,6 +59,7 @@
     "mocha-jsdom": "^1.1.0",
     "mocha-tap-reporter": "^0.1.3",
     "node-sass": "^4.1.1",
+    "nyc": "^10.0.0",
     "react": "^15.4.1",
     "react-addons-test-utils": "^15.4.1",
     "react-dom": "^15.4.1",

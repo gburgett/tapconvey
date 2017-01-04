@@ -1,0 +1,21 @@
+{
+  "include": [
+    "src/**/*.ts",
+    "www/**/*.ts?(x)"
+  ],
+  "exclude": [
+    "**/*.test.ts?(x)",
+    "www/index.tsx",
+    "www/_testserver.ts",
+    "www/dev_server.ts"
+  ],
+  "extension": [
+    ".ts",
+    ".tsx"
+  ],
+  "require": [
+    "ts-node/register",
+    "ignore-styles"
+  ],
+  "all": true
+}

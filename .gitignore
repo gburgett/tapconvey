@@ -13,3 +13,7 @@ www/**/*.js
 
 #Exclude built files
 dist/
+
+#Coverage
+coverage/
+.nyc_output/

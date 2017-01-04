@@ -37,7 +37,9 @@ describe('running tap test files', () => {
   })
 
   describe('run all', () => {
-    it('should have 4 master tests', done => {
+    it('should have 4 master tests', function (done) {
+      this.timeout(5000)
+
       const instance = runFile('./test/node-tap/*.tap.js')
 
       var tests: Test[] = []
