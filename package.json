@@ -11,7 +11,7 @@
     "test:src": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts?(x)'",
     "test:www": "mocha --require ignore-styles --require ./www/_require_jsdom.ts --compilers ts:ts-node/register --recursive 'www/**/*.test.ts?(x)'",
     "test:all": "yarn run test:src && yarn run test:www",
-    "test": "yarn run cover && nyc check-coverage --statements 90 --lines 90",
+    "test": "yarn run cover && nyc check-coverage --statements 93 --lines 90 --functions 90 --branches 80",
     "cover": "nyc yarn run test:all",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "watch": "nodemon -e ts,tsx --exec \"yarn run $1\""
