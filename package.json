@@ -9,7 +9,7 @@
     "dev:www": "tap test/**/*.js | ts-node www/_dev_server.ts",
     "build:www": "webpack --config www/webpack.config.js -v --display-error-details",
     "test:src": "mocha --compilers ts:ts-node/register --recursive 'src/**/*.test.ts?(x)'",
-    "test:www": "mocha --require ignore-styles --require ./www/_require_jsdom.js --compilers ts:ts-node/register --recursive 'www/**/*.test.ts?(x)'",
+    "test:www": "mocha --require ignore-styles --require ./www/_require_jsdom.ts --compilers ts:ts-node/register --recursive 'www/**/*.test.ts?(x)'",
     "test:all": "yarn run test:src && yarn run test:www",
     "test": "yarn run cover && nyc check-coverage --statements 90 --lines 90",
     "cover": "nyc yarn run test:all",
