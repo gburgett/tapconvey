@@ -79,6 +79,33 @@ describe('Client', () => {
       )
     })
 
+    it('should throw error on 304', function () {
+      const app = express()
+      app.use('/api', (req, res, next) => {
+        res.status(304).send('Not MOdified')
+        res.end()
+      })
+
+      const p = ++port
+      const server = app.listen(p)
+      after(() => {
+        server.close()
+      })
+
+      const instance = new ClientImpl(`http://localhost:${p}/api`)
+
+      return instance.getAllRuns().then(
+        data => {
+          expect.fail('should not give data')
+        },
+        (error: RequestError) => {
+          expect(error).to.be.instanceof(Error)
+          expect(error.message).to.equal(`Not Modified`)
+          expect(error.response.statusCode).to.equal(304)
+        }
+      )
+    })
+
     it('should return null if no data', function () {
       const app = express()
       app.use('/api', (req, res, next) => {

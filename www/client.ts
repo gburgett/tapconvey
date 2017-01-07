@@ -36,8 +36,6 @@ export class ClientImpl {
         .end((error, response) => {
           if (error) {
             reject(error)
-          } else if (response.status < 200 || response.status >= 300) {
-            reject(new RequestError(`GET ${url}: ${response.status}`, response))
           } else {
             var body
 
