@@ -171,12 +171,15 @@ describe('Client', () => {
       })()
       expected.tests = [
         new Test(1, "test_1.js", true, 1, 1, "1234ms", new Plan(1, 1),
+          [],
           new Assert(true, 1, "1 should equal 1", 100)),
         new Test(2, "test_2.js", false, 2, 1, "1234ms", new Plan(1, 2),
+          [],
           new Comment("a starting comment"),
           new Assert(false, 1, "1 should equal 2", 120),
           new Log("some", "log", "lines"),
           new Test(2, 'subtest 2', true, 1, 1, 'abcd', new Plan(1, 1),
+            ['test_2.js'],
             new Comment("a subcomment"),
             new Assert(true, 1, "1 == 1", 50)),
           new Assert(true, 2, "subtest 2", 100)),
@@ -220,6 +223,12 @@ describe('Client', () => {
           expect(test2.items[2]).to.be.instanceof(Log)
           expect(test2.items[3]).to.be.instanceof(Test, 'test2.items[3]')
           expect(test2.items[4]).to.be.instanceof(Assert, 'test2.items[4]')
+
+          const subtest_2 = test2.items[3] as Test
+          expect(subtest_2.path).to.deep.equal(['test_2.js'], 'subtest_2.path')
+          expect(subtest_2.items[0]).to.be.instanceof(Comment, 'subtest_2.items[0]')
+          expect((subtest_2.items[0] as Comment).comment).to.equal('a subcomment')
+          expect(subtest_2.items[1]).to.be.instanceof(Assert, 'subtest_2.items[1]')
         },
         (error) => {
           throw error

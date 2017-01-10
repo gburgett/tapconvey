@@ -107,12 +107,16 @@ export class NodeTapParser extends Transform {
       this._pushFinalized()
     }
 
+    const path = []
     if (self.current) {
-      // a child test, not a top-level test
+      // a child test, not a top-level test.
+      // push it to the stack and set the path on the new test.
       self.stack.push(self.current)
+      path.push(...self.current.path, self.current.name)
     }
     //we're entering a new test context
     self.current = new Test()
+    self.current.path = path
 
     this._attach(childParser)
   }

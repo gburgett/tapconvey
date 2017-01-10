@@ -50,6 +50,7 @@ describe('<TestRunView />', () => {
         1,
         '120ms',
         new Plan(0, 1),
+        [],
         new Assert(true, 1, 'assert 1')
       )
     ]
@@ -98,6 +99,7 @@ describe('<TestRunView />', () => {
         0,
         '120ms',
         new Plan(0, 1),
+        [],
         new Assert(false, 1, 'assert 1')
       )
     ]
@@ -147,6 +149,7 @@ describe('<TestRunView />', () => {
         1,
         '120ms',
         new Plan(0, 1),
+        [],
         new Assert(true, 1, 'assert 1')
       ),
       new Test(
@@ -157,6 +160,7 @@ describe('<TestRunView />', () => {
         0,
         '120ms',
         new Plan(0, 1),
+        [],
         new Assert(false, 1, 'assert 2')
       )
     ]

@@ -41,6 +41,7 @@ describe('<TestView />', () => {
       1,
       '123ms',
       new Plan(1, 1),
+      [],
       new Assert(
         true,
         1,
@@ -85,6 +86,7 @@ describe('<TestView />', () => {
       0,
       '123ms',
       new Plan(0, 1),
+      [],
       new Assert(
         false,
         1,
@@ -154,6 +156,7 @@ describe('<TestView />', () => {
       1,
       '123ms',
       new Plan(0, 1),
+      [],
       new Test(
         1,
         'subtest 1',
@@ -162,6 +165,7 @@ describe('<TestView />', () => {
         1,
         '100ms',
         new Plan(0, 1),
+        ['fake test'],
         new Assert(
           true,
           1,

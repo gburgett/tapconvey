@@ -51,6 +51,7 @@ export abstract class ResultItem {
 export class Test extends ResultItem {
   id: number
   name: string
+  path: string[]
   plan: Plan
   success: boolean
   successfulAsserts: number
@@ -60,7 +61,7 @@ export class Test extends ResultItem {
   items: Array<ResultItem>
 
   constructor(id?: number, name?: string, succes?: boolean, asserts?: number,
-    successfulAsserts?: number, time?: string, plan?: Plan,
+    successfulAsserts?: number, time?: string, plan?: Plan, path?: string[],
     ...items: Array<ResultItem>) {
     super(ResultItemType.Test)
     this.id = id
@@ -70,6 +71,7 @@ export class Test extends ResultItem {
     this.successfulAsserts = successfulAsserts
     this.time = time
     this.plan = plan
+    this.path = path || []
     this.items = items || []
   }
 
@@ -90,6 +92,9 @@ export class Test extends ResultItem {
     }
     if (input.items) {
       ret.items = input.items.map(ResultItem.deserialize)
+    }
+    if (input.path) {
+      ret.path.push(...input.path)
     }
     return ret
   }

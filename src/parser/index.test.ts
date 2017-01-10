@@ -2,7 +2,7 @@ import 'mocha'
 import { expect } from 'chai'
 
 import * as u from '../utils'
-import { Summary, Test, Assert, Comment, Log } from './results'
+import { Summary, Test, Assert, Comment, Log, Plan } from './results'
 import NodeTapParser from './index'
 
 const debug = require('debug')('tapconvey:parser')
@@ -222,6 +222,7 @@ ok 2 - test/node-tap/test_2.js # time=202.366ms
           expect(chunk.successfulAsserts).to.equal(1)
           expect(chunk.success).to.be.true
           expect(chunk.time).to.equal('202.366ms')
+          expect(chunk.path).to.deep.equal([], 'path')
           expect(chunk.items[0]).to.deep.equal(new Assert(true, 1, 'this is a good assert'))
           dataCount++
         }
@@ -303,6 +304,7 @@ ok 2 - test/node-tap/test_3.js # time=194.329ms
         expect(tests[1].successfulAsserts).to.equal(2, 'successfulAsserts')
         expect(tests[1].success).to.be.true
         expect(tests[1].time).to.equal('194.329ms', 'time')
+        expect(tests[1].path).to.deep.equal([], 'path')
         expect(tests[1].items[0]).to.deep.equal(new Assert(true, 1, 'this is a good assert for #3'))
         expect(tests[1].items[1]).to.deep.equal(new Assert(true, 2, 'this is a good assert for #4'))
 
@@ -680,6 +682,86 @@ bootstrap_node.js:535:3
 `,
           source: "t.equal(3, 4, 'this is a failed assert')\n"
         })
+
+        done()
+      })
+
+      // act
+      stdin.pipe(instance)
+    })
+  })
+
+  describe('deep test successful', () => {
+    const contents = `TAP version 13
+# Subtest: test/node-tap/test_2.js
+    1..1
+    # Subtest: this is one level down
+        1..2
+        # Subtest: this is two levels down
+            1..3
+            ok 1 - this is a good assert
+        ok 1 - this is two levels down # time=7.307ms
+    ok 1 - this is one level down # time=9.500ms
+ok 1 - test/node-tap/test_2.js # time=206.12ms
+
+1..1
+# time=218.956ms
+`
+    it('should show success in the summary', done => {
+      const stdin = u.stringToStream(contents)
+
+      var summaryCount = 0
+      const instance = new NodeTapParser()
+      instance.on('summary', (summary: Summary) => {
+        summaryCount++
+
+        expect(summary.tests.length).to.equal(1, 'summary.tests.length')
+
+        const top = summary.tests[0]
+        expect(top.success).to.equal(true, 'tests[0].success')
+        expect(top.comment).to.equal('test/node-tap/test_2.js', 'tests[0].comment')
+      })
+
+      instance.on('end', () => {
+        expect(summaryCount).to.equal(1)
+        done()
+      })
+
+      // act
+      stdin.pipe(instance)
+      instance.resume()
+    })
+
+    it('should have the correct path on each level', done => {
+      const stdin = u.stringToStream(contents)
+
+      var tests: Test[] = []
+      const instance = new NodeTapParser()
+      instance.on('data', (test) => {
+        if (test instanceof Test) {
+          tests.push(test)
+        }
+      })
+
+      instance.on('end', () => {
+        expect(tests).to.have.length(1, 'numTests')
+
+        const top = tests[0]
+        expect(top.name).to.equal('test/node-tap/test_2.js', 'top.name')
+        expect(top.plan).to.deep.equal(new Plan(1, 1))
+        expect(top.path).to.deep.equal([], 'top.path')
+
+        const level1 = top.items[0] as Test
+        expect(level1).is.instanceof(Test)
+        expect(level1.name).to.equal('this is one level down', 'level1.name')
+        expect(level1.plan).to.deep.equal(new Plan(1, 2))
+        expect(level1.path).to.deep.equal(['test/node-tap/test_2.js'], 'level1.path')
+
+        const level2 = level1.items[0] as Test
+        expect(level2).is.instanceof(Test)
+        expect(level2.name).to.equal('this is two levels down', 'level2.name')
+        expect(level2.plan).to.deep.equal(new Plan(1, 3))
+        expect(level2.path).to.deep.equal(['test/node-tap/test_2.js', 'this is one level down'], 'level2.path')
 
         done()
       })
