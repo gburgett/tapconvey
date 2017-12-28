@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import * as express from 'express'
 
 import { ClientImpl, TestRun, RequestError } from './client'
-import { Summary, Test, Assert, Comment, Log, Plan } from '../src/parser/results'
+import { Summary, Test, Assert, Comment, Log, Plan } from '../lib/parser/results'
 import { Server } from './_testserver'
 
 var port = 9876

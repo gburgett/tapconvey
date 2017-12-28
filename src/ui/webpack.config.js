@@ -1,5 +1,3 @@
-var HtmlWebpackPlugin = require('html-webpack-plugin')
-
 module.exports = {
   context: __dirname,
   entry: ['babel-polyfill', './index.tsx'],
@@ -12,7 +10,7 @@ module.exports = {
 
   resolve: {
     // Look for modules in .ts(x) files first, then .js(x)
-    extensions: ['', '.ts', '.tsx', '.js', '.jsx'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
 
   // Add the loader for .ts files.
@@ -21,11 +19,7 @@ module.exports = {
       {
         test: /\.tsx?$/,
         // run through ts-loader then babel, so we transform the jsx
-        loaders: ['babel', 'ts-loader']
-      },
-      {
-        test: /\.html$/,
-        loader: 'html'
+        loaders: ['babel-loader', 'ts-loader']
       },
       {
         test: /\.json$/,
@@ -34,21 +28,11 @@ module.exports = {
       {
         test: /\.scss$/,
         loaders: [
-          'style',
-          'css?sourceMap',
-          'sass?sourceMap'
+          'style-loader',
+          'css-loader?sourceMap',
+          'sass-loader?sourceMap'
         ]
       }
-    ],
-    preLoaders: [
-      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      { test: /\.js$/, loader: "source-map-loader" }
     ]
-  },
-
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: './index.html'
-    })
-  ]
+  }
 };

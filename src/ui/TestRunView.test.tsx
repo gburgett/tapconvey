@@ -5,7 +5,7 @@ import { shallow } from 'enzyme'
 
 import { TestRunView } from './TestRunView'
 import { TestRun } from './client'
-import { Summary, Test, Plan, Assert } from '../src/parser/results'
+import { Summary, Test, Plan, Assert } from '../lib/parser/results'
 
 describe('<TestRunView />', () => {
 

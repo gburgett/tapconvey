@@ -27,7 +27,7 @@ export class App extends React.Component<AppProps, any> {
     const store = self.props.store
     store.update().then(() => {
       self.setState({
-        stdin: store.stdin ? store.stdin.run : undefined
+        stdin: store.sdin ? store.stdin.run : undefined
       },
         self.tickFullUpdate.bind(self))
     },

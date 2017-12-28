@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
 
-import { Test, Assert, ResultItem, ResultItemType } from '../src/parser/results'
+import { Test, Assert, ResultItem, ResultItemType } from '../lib/parser/results'
 import { AssertView } from './AssertView'
 
 @observer
 export class TestView extends React.Component<{ test: Test }, undefined> {
 
   render() {
-    const {test} = this.props
+    const { test } = this.props
 
     var headerDesc = (<span>
       {test.successfulAsserts} / {test.asserts} asserts succeded ({test.time})

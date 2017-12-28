@@ -5,14 +5,11 @@ yarn-error.log
 src/**/*.map
 src/**/*.d.ts
 src/**/*.js
-
-www/**/*.map
-www/**/*.d.ts
-www/**/*.js
-!www/webpack.config.js
+!src/ui/webpack.config.js
 
 #Exclude built files
-dist/
+/app/
+/ui/
 
 #Coverage
 coverage/

@@ -10,8 +10,8 @@ import * as fs from 'fs'
 import { Transform } from 'stream'
 
 import { Server } from './_testserver'
-import { NodeTapParser } from '../src/parser'
-import { Summary, Test } from '../src/parser/results'
+import { NodeTapParser } from '../lib/parser'
+import { Summary, Test } from '../lib/parser/results'
 
 var WebpackDevServer = require("webpack-dev-server");
 

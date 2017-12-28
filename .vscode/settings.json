@@ -1,15 +1,19 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "files.exclude": {
-        "**/*.d.ts": true,
-        "**/*.map": true,
-        "**/*.js": {
-            "when": "$(basename).ts"
-        },
-        "**/*?.js": {
-            "when": "$(basename).tsx"
-        }
+  "files.exclude": {
+    "**/*.d.ts": {
+      "when": "$(basename).ts"
     },
-    "editor.formatOnSave": true,
-    "typescript.tsdk": "./node_modules/typescript/lib"
+    "**/*.map": {
+      "when": "$(basename).ts"
+    },
+    "**/*.js": {
+      "when": "$(basename).ts"
+    },
+    "**/*?.js": {
+      "when": "$(basename).tsx"
+    }
+  },
+  "editor.formatOnSave": true,
+  "typescript.tsdk": "./node_modules/typescript/lib"
 }

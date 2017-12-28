@@ -10,7 +10,7 @@ import * as sinon from 'sinon'
 import { App, TIMEOUTS } from './app'
 import { TestRunList } from './TestRunList'
 import { TestRun } from './client'
-import { Summary } from '../src/parser/results'
+import { Summary } from '../lib/parser/results'
 
 describe('<App />', () => {
 

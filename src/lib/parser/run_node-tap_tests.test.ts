@@ -2,8 +2,8 @@ import 'mocha'
 import { expect } from 'chai'
 import { spawn } from 'child_process'
 
-import NodeTapParser from '../../src/parser'
-import { Test } from '../../src/parser/results'
+import NodeTapParser from '../parser'
+import { Test } from '../parser/results'
 
 describe('running tap test files', () => {
 

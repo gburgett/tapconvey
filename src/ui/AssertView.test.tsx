@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { shallow } from 'enzyme'
 
 import { AssertView } from './AssertView'
-import { Test, Plan, Assert } from '../src/parser/results'
+import { Test, Plan, Assert } from '../lib/parser/results'
 
 describe('<AssertView />', function () {
 

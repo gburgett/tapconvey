@@ -3,8 +3,8 @@
  *   ignored by Istanbul
  */
 
-import { Summary, Test } from '../src/parser/results'
-import { NodeTapParser } from '../src/parser'
+import { Summary, Test } from '../lib/parser/results'
+import { NodeTapParser } from '../lib/parser'
 import * as express from 'express'
 import * as http from 'http'
 import { Writable, Readable } from 'stream'

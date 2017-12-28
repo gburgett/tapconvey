@@ -1,5 +1,5 @@
 import * as request from 'superagent'
-import * as Results from '../src/parser/results'
+import * as Results from '../lib/parser/results'
 
 export class TestRun {
   public summary: Results.Summary
