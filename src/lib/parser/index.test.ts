@@ -377,13 +377,13 @@ ok 1 - test/node-tap/test_2.js # time=206.12ms
         expect(tests[0].name).to.equal('test/node-tap/test_2.js', 'test[0].name')
         expect(tests[0].asserts).to.equal(1, 'asserts')
         expect(tests[0].successfulAsserts).to.equal(1, 'successfulAsserts')
-        expect(tests[0].items[0]).to.deep.equal(new Log(
+        expect(tests[0].items[0]).to.deep.equal(new Log([
           'heres some stdout',
           "that's even multiline"
-        ), 'items[0]')
+        ]), 'items[0]')
         expect(tests[0].items[1]).to.deep.equal(new Comment('# hello this is a comment'), 'items[1]')
         expect(tests[0].items[2]).to.deep.equal(new Assert(true, 1, 'this is a good assert'), 'items[2]')
-        expect(tests[0].items[3]).to.deep.equal(new Log('and some more stdout'), 'items[3]')
+        expect(tests[0].items[3]).to.deep.equal(new Log(['and some more stdout']), 'items[3]')
 
         done()
       })

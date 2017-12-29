@@ -94,7 +94,7 @@ export class NodeTapParser extends Transform {
       }
 
       if (!appended) {
-        this.current.items.push(new Log(extra))
+        this.current.items.push(new Log([extra]))
       }
     }
   }

@@ -9,6 +9,7 @@ src/**/*.js
 
 #Exclude built files
 /app/
+/lib/
 /ui/
 
 #Coverage
