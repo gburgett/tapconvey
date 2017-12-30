@@ -10,11 +10,8 @@
     "dev:ui": "tap test/**/*.js | ts-node www/_dev_server.ts",
     "test:app": "mocha --compilers ts:ts-node/register --recursive 'src/app/**/*.test.ts' 'src/lib/**/*.test.ts'",
     "test:ui": "karma start --single-run",
-    "test:all": "yarn run test:app && yarn run test:ui",
-    "test": "yarn run cover && nyc check-coverage --statements 93 --lines 90 --functions 90 --branches 80",
-    "cover": "nyc yarn run test:all",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls",
-    "watch": "nodemon -e ts,tsx --exec \"yarn run $1\""
+    "test": "npm run test:app && npm run test:ui",
+    "watch": "nodemon -e ts,tsx --exec \"npm run $1\""
   },
   "keywords": [
     "tap",
@@ -45,7 +42,6 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "chai": "^4.1.2",
-    "coveralls": "^2.11.15",
     "css-loader": "^0.26.1",
     "enzyme": "^3.0",
     "enzyme-adapter-react-15": "^1.0.5",
@@ -56,7 +52,6 @@
     "html-loader": "^0.5.1",
     "html-webpack-plugin": "^2.30.1",
     "ignore-styles": "^5.0.1",
-    "istanbul": "^0.4.5",
     "js-yaml": "^3.7.0",
     "jsdom": "^9.8.3",
     "json-loader": "^0.5.4",
@@ -73,7 +68,6 @@
     "mocha-jsdom": "^1.1.0",
     "mocha-tap-reporter": "^0.1.3",
     "node-sass": "^4.1.1",
-    "nyc": "^10.0.0",
     "react": "^15.0",
     "react-dom": "^15.0",
     "react-hot-loader": "next",
