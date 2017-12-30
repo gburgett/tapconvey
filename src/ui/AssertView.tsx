@@ -1,13 +1,12 @@
 import * as React from 'react'
-import * as yaml from 'js-yaml'
 
-import { Assert } from '../src/parser/results'
+import { Assert } from '../lib/parser/results'
 
 const styles = require('./AssertView.scss')
 
 export class AssertView extends React.Component<{ assert: Assert }, undefined> {
   render() {
-    const {assert} = this.props
+    const { assert } = this.props
     var css = 'assert-fail'
     if (assert.success) {
       css = 'assert-success'
@@ -25,9 +24,7 @@ export class AssertView extends React.Component<{ assert: Assert }, undefined> {
     var data
     if (assert.data) {
       data = (<pre>
-        {yaml.safeDump(assert.data, {
-          skipInvalid: true
-        })}
+        {JSON.stringify(assert.data)}
       </pre>)
     }
 

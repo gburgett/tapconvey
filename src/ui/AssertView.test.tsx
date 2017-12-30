@@ -1,10 +1,12 @@
-import 'mocha'
 import * as React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { configure, shallow } from 'enzyme'
+
+const Adapter = require('enzyme-adapter-react-15')
+configure({ adapter: new Adapter() })
 
 import { AssertView } from './AssertView'
-import { Test, Plan, Assert } from '../src/parser/results'
+import { Test, Plan, Assert } from '../lib/parser/results'
 
 describe('<AssertView />', function () {
 
@@ -55,9 +57,10 @@ describe('<AssertView />', function () {
 
       //assert
       const data = rendered.find('.assert-body')
-      expect(data.text()).to.contain('some:')
-      expect(data.text()).to.contain('data')
-      expect(data.text()).to.contain('\'1\'')
+      const splat = JSON.parse(data.text())
+      expect(splat).to.have.property('some')
+      expect(splat['some']).to.equal('data')
+      expect(splat.deep.array[0]).to.equal('1')
     })
   })
 

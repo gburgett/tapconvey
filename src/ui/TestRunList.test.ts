@@ -1,11 +1,10 @@
-import 'mocha'
 import { expect } from 'chai'
 import * as sinon from 'sinon'
 
 import { asMap, observe } from 'mobx'
 
 import { Client, TestRun, RequestError } from './client'
-import { Summary, Test, Assert, Comment, Log, Plan } from '../src/parser/results'
+import { Summary, Test, Assert, Comment, Log, Plan } from '../lib/parser/results'
 import { TestRunList } from './TestRunList'
 
 var port = 9876

@@ -1,16 +1,16 @@
-import 'mocha'
 import * as React from 'react'
-import { shallow, mount } from 'enzyme'
-import { expect, use } from 'chai'
-import * as chaiEnzyme from 'chai-enzyme'
-use(chaiEnzyme())
+import { expect } from 'chai'
 import { asMap } from 'mobx'
 import * as sinon from 'sinon'
+
+import { configure, shallow, mount } from 'enzyme'
+const Adapter = require('enzyme-adapter-react-15')
+configure({ adapter: new Adapter() })
 
 import { App, TIMEOUTS } from './app'
 import { TestRunList } from './TestRunList'
 import { TestRun } from './client'
-import { Summary } from '../src/parser/results'
+import { Summary } from '../lib/parser/results'
 
 describe('<App />', () => {
 
@@ -34,8 +34,8 @@ describe('<App />', () => {
       const app = shallow(<App store={mock} />)
 
       const view = app.find('TestRunView')
-      expect(view).to.have.prop('run').equal(run)
-      expect(view).to.have.prop('source').equal('stdin')
+      expect(view.props()).to.have.property('run').equal(run)
+      expect(view.props()).to.have.property('source').equal('stdin')
       expect(view.key()).to.equal('stdin')
     })
   })

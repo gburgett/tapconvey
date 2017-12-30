@@ -1,11 +1,13 @@
-import 'mocha'
 import * as React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+
+import { configure, shallow } from 'enzyme'
+const Adapter = require('enzyme-adapter-react-15')
+configure({ adapter: new Adapter() })
 
 import { TestRunView } from './TestRunView'
 import { TestRun } from './client'
-import { Summary, Test, Plan, Assert } from '../src/parser/results'
+import { Summary, Test, Plan, Assert } from '../lib/parser/results'
 
 describe('<TestRunView />', () => {
 

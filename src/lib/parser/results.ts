@@ -153,12 +153,12 @@ export class Comment extends ResultItem {
 
 export class Log extends ResultItem {
   lines: string[]
-  constructor(...lines: string[]) {
+  constructor(lines?: string[]) {
     super(ResultItemType.Log)
     this.lines = lines || []
   }
 
   public static deserialize(input: any): Log {
-    return new Log(...input.lines)
+    return new Log(input.lines)
   }
 }
