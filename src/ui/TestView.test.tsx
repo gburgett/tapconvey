@@ -1,7 +1,9 @@
-import 'mocha'
 import * as React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+
+import { configure, shallow } from 'enzyme'
+const Adapter = require('enzyme-adapter-react-15')
+configure({ adapter: new Adapter() })
 
 import { TestView } from './TestView'
 import { Test, Plan, Assert } from '../lib/parser/results'

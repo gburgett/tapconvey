@@ -1,8 +1,7 @@
 
 import * as Results from '../lib/parser/results'
-import * as debug from 'debug'
 
-const d = debug('tc:client.ts')
+const d = require('debug')('tc:client.ts')
 
 export class TestRun {
   public summary: Results.Summary

@@ -1,7 +1,5 @@
-import 'mocha'
 import { expect } from 'chai'
-import * as express from 'express'
-
+import * as fetchMock from 'fetch-mock'
 import { ClientImpl, TestRun, RequestError } from './client'
 import { Summary, Test, Assert, Comment, Log, Plan } from '../lib/parser/results'
 import { Server } from './_testserver'
@@ -26,25 +24,18 @@ describe('Client', () => {
     })
 
     it('should throw error on 404', function () {
-      const app = express()
-      app.use('/api', (req, res, next) => {
-        res.status(404).send('Not Found')
-        res.end()
-      })
 
-      const p = ++port
-      const server = app.listen(p)
-      after(() => {
-        server.close()
-      })
+      fetchMock.once(/\/api/, 404)
 
-      const instance = new ClientImpl(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:9999/api`)
 
+      // act
       return instance.getAllRuns().then(
         data => {
           expect.fail('should not give data')
         },
         (error: RequestError) => {
+          // assert
           expect(error).to.be.instanceof(Error)
           expect(error.message).to.equal(`Not Found`)
           expect(error.response.statusCode).to.equal(404)
@@ -53,25 +44,18 @@ describe('Client', () => {
     })
 
     it('should throw error on 500', function () {
-      const app = express()
-      app.use('/api', (req, res, next) => {
-        res.status(500).send('Internal Server Error')
-        res.end()
-      })
 
-      const p = ++port
-      const server = app.listen(p)
-      after(() => {
-        server.close()
-      })
+      fetchMock.once(/\/api/, 500)
 
-      const instance = new ClientImpl(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:9999/api`)
 
+      // act
       return instance.getAllRuns().then(
         data => {
           expect.fail('should not give data')
         },
         (error: RequestError) => {
+          // assert
           expect(error).to.be.instanceof(Error)
           expect(error.message).to.equal(`Internal Server Error`)
           expect(error.response.statusCode).to.equal(500)
@@ -80,25 +64,17 @@ describe('Client', () => {
     })
 
     it('should throw error on 304', function () {
-      const app = express()
-      app.use('/api', (req, res, next) => {
-        res.status(304).send('Not MOdified')
-        res.end()
-      })
 
-      const p = ++port
-      const server = app.listen(p)
-      after(() => {
-        server.close()
-      })
+      fetchMock.once(/\/api/, 304)
 
-      const instance = new ClientImpl(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:9999/api`)
 
       return instance.getAllRuns().then(
         data => {
           expect.fail('should not give data')
         },
         (error: RequestError) => {
+          // assert
           expect(error).to.be.instanceof(Error)
           expect(error.message).to.equal(`Not Modified`)
           expect(error.response.statusCode).to.equal(304)
@@ -107,19 +83,10 @@ describe('Client', () => {
     })
 
     it('should return null if no data', function () {
-      const app = express()
-      app.use('/api', (req, res, next) => {
-        res.status(200).send()
-        res.end()
-      })
 
-      const p = ++port
-      const server = app.listen(p)
-      after(() => {
-        server.close()
-      })
+      fetchMock.once(/\/api/, {})
 
-      const instance = new ClientImpl(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:9999/api`)
 
       return instance.getAllRuns().then(
         data => {
@@ -132,19 +99,14 @@ describe('Client', () => {
     })
 
     it('should return error on bad data', function () {
-      const app = express()
-      app.use('/api', (req, res, next) => {
-        res.status(200).send('{ \"this starts out\" : \"as some json\" but... ')
-        res.end()
-      })
 
-      const p = ++port
-      const server = app.listen(p)
-      after(() => {
-        server.close()
+      fetchMock.once(/\/api/, {
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: '{ \"this starts out\" : \"as some json\" but... '
       })
-
-      const instance = new ClientImpl(`http://localhost:${p}/api`)
+      const instance = new ClientImpl(`http://localhost:9999/api`)
 
       return instance.getAllRuns().then(
         data => {
@@ -166,7 +128,7 @@ describe('Client', () => {
           new Assert(true, 1, "test_1.js", 1000),
           new Assert(false, 2, "test_2.js", 850)
         ]
-        s.extra = new Log("abcd", "1234")
+        s.extra = new Log(["abcd", "1234"])
         return s
       })()
       expected.tests = [
@@ -177,7 +139,7 @@ describe('Client', () => {
           [],
           new Comment("a starting comment"),
           new Assert(false, 1, "1 should equal 2", 120),
-          new Log("some", "log", "lines"),
+          new Log(["some", "log", "lines"]),
           new Test(2, 'subtest 2', true, 1, 1, 'abcd', new Plan(1, 1),
             ['test_2.js'],
             new Comment("a subcomment"),
@@ -185,24 +147,24 @@ describe('Client', () => {
           new Assert(true, 2, "subtest 2", 100)),
       ]
 
-      const app = express()
       const testServer = new Server()
-      testServer.init(app)
-
-      const p = ++port
-      const http = app.listen(p)
-      after(() => {
-        http.close()
-      })
-
       testServer.pushNewTestRun('stdin')
       testServer.pushTests('stdin', ...expected.tests)
       testServer.pushSummary('stdin', expected.summary)
 
-      const instance = new ClientImpl(`http://localhost:${p}/api`)
+      fetchMock.once(/\/api\/allRuns/, {
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(testServer.getAllTestRuns())
+      })
 
+      const instance = new ClientImpl(`http://localhost:9999/api`)
+
+      // act
       return instance.getAllRuns().then(
         map => {
+          // assert
           expect(map.size).to.equal(1, 'expect map with one source')
           expect(map.keys().next().value).to.equal('stdin', 'expect single source to be stdin')
 

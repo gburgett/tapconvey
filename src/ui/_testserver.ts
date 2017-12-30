@@ -3,23 +3,11 @@
  *   ignored by Istanbul
  */
 
-import { Summary, Test } from '../lib/parser/results'
-import { NodeTapParser } from '../lib/parser'
-import * as express from 'express'
-import * as http from 'http'
 import { Writable, Readable } from 'stream'
 
+import { Summary, Test } from '../lib/parser/results'
+import { NodeTapParser } from '../lib/parser'
 import { TestRun } from './client'
-
-
-const requestLogger: express.RequestHandler = (
-  request: express.Request,
-  response: express.Response,
-  next: express.NextFunction
-) => {
-  console.info(`${(new Date()).toUTCString()}|${request.method}|${request.url}|${request.ip}`);
-  next();
-}
 
 class ServerWritable extends Writable {
   private readonly server: Server
@@ -50,26 +38,8 @@ class ServerWritable extends Writable {
 
 }
 
-
 export class Server {
   private readonly testRuns = new Map<string, TestRun>()
-
-  constructor() {
-  }
-
-  public init(app: express.Application) {
-    app.use(requestLogger)
-    var routes = express.Router()
-    app.use('/api', routes)
-
-    const self = this
-    routes.get('/allRuns', (req, res, next) => {
-      const ret = JSON.stringify(self._getAllTestRuns())
-      res.contentType('application/json')
-      res.write(ret)
-      res.end()
-    })
-  }
 
   public writeableSource(source: string): Writable {
     return new ServerWritable(this, source)
@@ -97,7 +67,7 @@ export class Server {
 
   // Handler methods
 
-  private _getAllTestRuns(): Array<[string, TestRun]> {
+  public getAllTestRuns(): Array<[string, TestRun]> {
     return [...this.testRuns]
   }
 

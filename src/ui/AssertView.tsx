@@ -1,5 +1,4 @@
 import * as React from 'react'
-import * as yaml from 'js-yaml'
 
 import { Assert } from '../lib/parser/results'
 
@@ -25,9 +24,7 @@ export class AssertView extends React.Component<{ assert: Assert }, undefined> {
     var data
     if (assert.data) {
       data = (<pre>
-        {yaml.safeDump(assert.data, {
-          skipInvalid: true
-        })}
+        {JSON.stringify(assert.data)}
       </pre>)
     }
 
