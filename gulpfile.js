@@ -1,12 +1,13 @@
 var gulp = require('gulp')
+var gutil = require('gulp-util')
 var ts = require('gulp-typescript')
 var merge = require('merge2')
-var webpack = require('webpack-stream')
+var webpack = require('webpack')
 var fs = require('fs')
 var debug = require('gulp-debug')
 
-var appTsproj = ts.createProject('tsconfig.json');
-var libTsproj = ts.createProject('tsconfig.json');
+var appTsproj = ts.createProject({});
+var libTsproj = ts.createProject({});
 
 gulp.task('build:app', ['build:lib'], (done) => {
   var tsResult = gulp.src(["src/app/**/*.ts", "!src/app/**/*.test.ts"])
@@ -35,10 +36,23 @@ gulp.task('build:lib', (done) => {
 })
 
 gulp.task('build:ui', (done) => {
-  options = require('./src/ui/webpack.config')
+  options = require('./webpack.config')
 
-  return gulp.src(['src/ui/**/*.ts', "!src/ui/**/*.test.ts", '!src/**/_*'])
-    .pipe(webpack(options))
-    .pipe(gulp.dest('ui'))
-    .on('end', done)
+  webpack(options, (err, stats) => {
+    if (err) {
+      done(new gutil.PluginError('webpack', err))
+      return
+    }
+
+    gutil.log('[webpack]', stats.toString({
+      colors: true,
+      chunks: false
+    }));
+
+    if (stats.hasErrors()) {
+      done(new gutil.PluginError('webpack', stats.compilation.errors[0]))
+    } else {
+      done()
+    }
+  })
 })

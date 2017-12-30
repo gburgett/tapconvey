@@ -1,1 +1,19 @@
-{}
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "target": "es6",
+    "moduleResolution": "node",
+    "lib": [
+      "es6",
+      "dom"
+    ],
+    "allowJs": true,
+    "experimentalDecorators": true
+  },
+  "files": [
+    "index.tsx"
+  ],
+  "awesomeTypescriptLoaderOptions": {
+    "useBabel": true
+  }
+}

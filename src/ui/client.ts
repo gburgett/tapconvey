@@ -1,5 +1,8 @@
-import * as request from 'superagent'
+
 import * as Results from '../lib/parser/results'
+import * as debug from 'debug'
+
+const d = debug('tc:client.ts')
 
 export class TestRun {
   public summary: Results.Summary
@@ -30,43 +33,26 @@ export class ClientImpl {
   public async getAllRuns(): Promise<Map<string, TestRun>> {
     const self = this
     const url = self.url + '/allRuns'
-    return new Promise<Map<string, TestRun>>((resolve, reject) => {
-      request
-        .get(url)
-        .end((error, response) => {
-          if (error) {
-            reject(error)
-          } else {
-            var body
+    return fetch(url)
+      .then((response) => {
+        return response.json().then((body) => {
+          d('GET %s\n\t%o', url, response)
 
-            if (Object.keys(response.body).length === 0 && response.text.length > 0) {
-              try {
-                body = JSON.parse(response.text)
-              } catch (e) {
-                reject(e)
-                return
-              }
-            } else {
-              body = response.body
-            }
-
-            if (Object.keys(response.body).length === 0) {
-              resolve(null)
-              return
-            }
-
-            const ret = new Map<string, TestRun>()
-            body.forEach(obj => {
-              const run = new TestRun()
-              run.summary = Results.Summary.deserialize(obj[1].summary)
-              run.tests = obj[1].tests.map(Results.Test.deserialize)
-              ret.set(obj[0], run)
-            })
-
-            resolve(ret)
+          if (Object.keys(body).length === 0) {
+            return null
           }
+
+          const ret = new Map<string, TestRun>()
+          body.forEach(obj => {
+            const run = new TestRun()
+            run.summary = Results.Summary.deserialize(obj[1].summary)
+            run.tests = obj[1].tests.map(Results.Test.deserialize)
+            ret.set(obj[0], run)
+          })
+
+          return ret
         })
-    })
+      })
   }
 
 

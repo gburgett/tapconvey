@@ -1,11 +1,12 @@
-/* 
- * index.tsx: entry point and composition root for React app 
+/*
+ * index.tsx: entry point and composition root for React app
  *   ignored by Istanbul
  */
 
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
+// Injected by react-hot-loader
 declare var module: { hot: any };
 
 import { Client, ClientImpl } from './client'

@@ -8,10 +8,6 @@ import { TestView } from './TestView'
 @observer
 export class TestRunView extends React.Component<{ source: string, run: TestRun }, undefined> {
 
-  constructor() {
-    super()
-  }
-
   render() {
     const { run, source } = this.props
 

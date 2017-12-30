@@ -1,8 +1,11 @@
+const path = require('path')
+const { CheckerPlugin } = require('awesome-typescript-loader')
+
 module.exports = {
   context: __dirname,
-  entry: ['babel-polyfill', './index.tsx'],
+  entry: ['babel-polyfill', './src/ui/index.tsx'],
   output: {
-    path: __dirname + '/dist',
+    path: path.join(__dirname, 'ui'),
     filename: '[name].js'
   },
   // Source maps support ('inline-source-map' also works)
@@ -19,11 +22,7 @@ module.exports = {
       {
         test: /\.tsx?$/,
         // run through ts-loader then babel, so we transform the jsx
-        loaders: ['babel-loader', 'ts-loader']
-      },
-      {
-        test: /\.json$/,
-        loader: 'json'
+        loaders: ['babel-loader', 'awesome-typescript-loader']
       },
       {
         test: /\.scss$/,
@@ -34,5 +33,8 @@ module.exports = {
         ]
       }
     ]
-  }
+  },
+  plugins: [
+    new CheckerPlugin()
+  ]
 };
