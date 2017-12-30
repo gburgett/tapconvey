@@ -5,7 +5,8 @@
   "main": "app/index.js",
   "typings": "app/index.d.js",
   "scripts": {
-    "clean:ts": "find `pwd`/src -type f -name '*.ts' ! -name '*.d.ts' | sed 's/\\.ts$//' | xargs -I file find file.map file.js file.d.ts -exec rm {} +",
+    "build": "gulp build",
+    "clean": "rm -rf lib/ ui/ app/",
     "dev:ui": "tap test/**/*.js | ts-node www/_dev_server.ts",
     "test:app": "mocha --compilers ts:ts-node/register --recursive 'src/app/**/*.test.ts' 'src/lib/**/*.test.ts'",
     "test:ui": "karma start --single-run",

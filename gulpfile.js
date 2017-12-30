@@ -9,6 +9,10 @@ var debug = require('gulp-debug')
 var appTsproj = ts.createProject({});
 var libTsproj = ts.createProject({});
 
+gulp.task('default', ['build'])
+
+gulp.task('build', ['build:app', 'build:lib', 'build:ui'])
+
 gulp.task('build:app', ['build:lib'], (done) => {
   var tsResult = gulp.src(["src/app/**/*.ts", "!src/app/**/*.test.ts"])
     .pipe(debug())
